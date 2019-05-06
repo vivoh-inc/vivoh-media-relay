@@ -1,0 +1,74 @@
+<html>
+
+  <style>
+    body {
+    background-color: black;
+    color: white;
+    }
+    #video {
+    width: 960px;
+    height: 540px;
+    }
+    
+    .centered {
+    margin: auto;
+    text-align: center;
+    }
+    
+  </style>
+</head>
+
+<body>
+  
+  <div class="centered">
+    <video controls id="video"></video>
+
+  </div>
+  
+  <script src="/player/flv.min.js"></script>
+  
+  <script>
+    var flvPlayer = undefined;
+        
+    function loadFlvPlayer() {
+    if (flvjs.isSupported()) {
+    var host = document.location.host;
+    const pathname = document.location.pathname;
+
+    let path = "";
+    // If we are using /rtp/239_0_0_1__1234, detect and use that.
+    // Else, use s parameter to make the app/stream.
+    if( pathname.indexOf( "__" ) !== -1 ) {
+      // Get protocol and port
+      path = pathname.replace("/ws.html", ".flv");
+    }
+    else {
+      // Use the s param
+      const s = document.location.search.s;
+      const chunks = s.split( "/" );
+      const app = chunks[0];
+      const stream = chunks[1]
+        .replace( "//", "")
+        .replace(/\./g, '_')
+        .replace( ":", "__");
+        path = "app" + "/" + stream + ".flv";
+      }
+
+    var videoElement = document.getElementById('video');
+    var url = ( document.location.protocol === 'https' ? "wss" : "ws" ) + ( "://" + host + path );
+    flvPlayer = flvjs.createPlayer({
+    type: 'flv',
+    url: url
+    });
+    flvPlayer.attachMediaElement(videoElement);
+    flvPlayer.load();
+    }
+    }
+    
+    document.addEventListener("DOMContentLoaded", (event) => {
+    loadFlvPlayer()
+    })
+    
+  </script> 
+</body>
+</html>
