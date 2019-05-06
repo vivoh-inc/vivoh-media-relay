@@ -67,7 +67,7 @@ module.exports.processConfig = (processedArguments) => {
     config.fixedDirectory = path.resolve(config.fixedDirectory);
   }
 
-  config.segmenter = !config.useFfmpeg ? ffmpegSegmenter : vlcSegmenter;
+  config.segmenter = config.useFfmpeg ? ffmpegSegmenter : vlcSegmenter;
   config.overwrite = processedArguments.o;
   config.logFormat = processedArguments.l || processedArguments.logFormat;
 

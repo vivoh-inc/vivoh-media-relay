@@ -24,24 +24,19 @@ describe("#config", () => {
 	
     });
     
-  it("should get the correct segmenter", () => {
-    const args = {};
-    const config = processConfig(args);
-    expect(config.segmenter.name).toBe("ffmpeg");
-  });
-
-	it( "should set vlc as default", () => {
-		const args = {};
-    const config = processConfig(args);
-    expect(config.useVlc).toBeTruthy();
-	})
-
-	it( "should allow setting ffmpeg", () => {
-		const args = {f: true};
-    const config = processConfig(args);
-    expect(config.useVlc).toBeFalsy();
-		expect(config.useFfmpeg).toBeTruthy();		
-	})
-
+    it("should get the correct segmenter (vlc by default)", () => {
+	const args = {};
+	const config = processConfig(args);
+	expect(config.segmenter.name).toBe("vlc");
+	expect(config.useVlc).toBeTruthy();
+    });
+    
+    it( "should allow setting ffmpeg", () => {
+	const args = {f: true};
+	const config = processConfig(args)
+	expect(config.useVlc).toBeFalsy();
+	expect(config.useFfmpeg).toBeTruthy();
+	expect(config.segmenter.name).toBe("ffmpeg");
+    })
 
 });
