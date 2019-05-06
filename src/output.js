@@ -4,7 +4,6 @@ const ready = module.exports.ready = () => '.'.green.bold;
 const startVlc = module.exports.startVlc = () => '!'.red.bold;
 const startFfmpeg = module.exports.startFfmpeg = () => '*'.red.bold;
 const startServer = module.exports.startServer = () => '🛫'.red.bold;
-const stopServer = module.exports.stopServer = () => '🛬'.blue.bold;
 const holding = module.exports.holding = () => '@'.yellow.bold;
 const {version} = require( './version');
 

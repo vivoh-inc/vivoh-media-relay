@@ -1,39 +1,38 @@
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 const config = {};
-const vlcSegmenter = require("./vlc");
-const ffmpegSegmenter = require("./ffmpeg");
+const vlcSegmenter = require('./vlc');
+const ffmpegSegmenter = require('./ffmpeg');
 
 module.exports.updateConfig = (key, value) => {
   config[key] = value;
   return config;
 };
 
-const getExtras = args => {
+const getExtras = (args) => {
   if (args.v) {
     const e = {
       extras: args.vlcExtras,
       vlc: args.vlcBin,
-      log: args.vlcLogFile
+      log: args.vlcLogFile,
     };
     return e;
   } else {
     const e = {
       extras: args.ffmpegExtras,
       ffmpeg: args.ffmpegBin,
-      log: args.ffmpegLogFile
+      log: args.ffmpegLogFile,
     };
     return e;
   }
 };
 
-module.exports.processConfig = processedArguments => {
+module.exports.processConfig = (processedArguments) => {
   config.fixedDirectory = processedArguments.d;
   config.useFfmpeg = config.useVlc = false;
-  if( processedArguments.f ) {
+  if ( processedArguments.f ) {
     config.useFfmpeg = true;
-  }
-  else {
+  } else {
     config.useVlc = true;
   }
   config.extras = getExtras(processedArguments);
@@ -46,20 +45,20 @@ module.exports.processConfig = processedArguments => {
     config.dontAddAacSwitches = true;
   }
   config.valid = true;
-  config.type = "hls";
+  config.type = 'hls';
 
   // config.useFfmpeg;
   config.extras = getExtras(processedArguments);
 
   if (!config.fixedDirectory) {
-    config.fixedDirectory = "./vivoh_media_relay";
+    config.fixedDirectory = './vivoh_media_relay';
     // Make it if not there.
     if (!fs.existsSync(config.fixedDirectory)) {
       fs.mkdirSync(config.fixedDirectory);
     } else {
-      fs.readdirSync(config.fixedDirectory).forEach(f => {
+      fs.readdirSync(config.fixedDirectory).forEach((f) => {
         const fileToDelete = path.join(config.fixedDirectory, f);
-        console.log("about to delete: ", fileToDelete);
+        console.log('about to delete: ', fileToDelete);
         fs.unlinkSync(fileToDelete);
       });
     }

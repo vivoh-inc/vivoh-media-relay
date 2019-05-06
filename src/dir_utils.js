@@ -4,7 +4,6 @@ const glob = require('glob');
 const res = require('path').resolve;
 const path = require('path');
 const colors = require('colors'); // eslint-disable-line no-unused-vars
-const w = require('./output').write;
 
 module.exports.fixDirectory = (dir) => {
   let result = dir;
