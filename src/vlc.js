@@ -10,13 +10,8 @@ const pids = {};
 
 module.exports.name = 'vlc';
 
-module.exports.launchIfNecessary = ({
-  address,
-  fixedDirectory,
-  ipAddress,
-  port,
-  extras,
-}) => {
+module.exports.launchIfNecessary = ({ fixedDirectory,
+  ipAddress, port, extras}, {address}) => {
   return new Promise((resolve, reject) => {
     isVlcRunning(address).then((running) => {
       if (running) {
