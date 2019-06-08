@@ -17,7 +17,6 @@ module.exports.launchIfNecessary = (config, { address }) => {
     ipAddress,
     port,
   } = config;
-
   return new Promise((resolve, reject) => {
     isVlcRunning(address).then((running) => {
       if (running) {
