@@ -24,11 +24,11 @@ describe("#config", () => {
 	
     });
     
-    it("should get the correct segmenter (vlc by default)", () => {
+    it("should get the correct segmenter (ffmpeg by default)", () => {
 	const args = {};
 	const config = processConfig(args);
-	expect(config.segmenter.name).toBe("vlc");
-	expect(config.useVlc).toBeTruthy();
+	expect(config.segmenter.name).toBe("ffmpeg");
+	expect(config.useFfmpeg).toBeTruthy();
     });
     
     it( "should allow setting ffmpeg", () => {

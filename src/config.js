@@ -30,10 +30,10 @@ const getExtras = (args) => {
 module.exports.processConfig = (processedArguments) => {
   config.fixedDirectory = processedArguments.d;
   config.useFfmpeg = config.useVlc = false;
-  if ( processedArguments.f ) {
-    config.useFfmpeg = true;
-  } else {
+  if ( processedArguments.v ) {
     config.useVlc = true;
+  } else {
+    config.useFfmpeg = true;
   }
   config.extras = getExtras(processedArguments);
   config.ipAddress = processedArguments.i || '0.0.0.0';
