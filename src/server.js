@@ -24,6 +24,13 @@ const startServer = (module.exports.startServer = (config) => {
     );
 
     console.log('port, ip', config.port, config.ipAddress);
-    http.createServer(app).listen(config.port, config.ipAddress);
+
+    if (config.crendentials) {
+      server = https
+          .createServer(config.credentials, app)
+          .listen(config.port, config.ipAddress);
+    } else {
+      server = http.createServer(app).listen(resolvedPort, bindAddress);
+    }
   }
 });
