@@ -30,7 +30,7 @@ const startServer = (module.exports.startServer = (config) => {
           .createServer(config.credentials, app)
           .listen(config.port, config.ipAddress);
     } else {
-      server = http.createServer(app).listen(resolvedPort, bindAddress);
+      server = http.createServer(app).listen(config.port, config.ipAddress);
     }
   }
 });
