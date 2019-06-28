@@ -3457,9 +3457,9 @@ node-gyp@^3.8.0:
     tar "^2.0.0"
     which "1"
 
-"node-media-server@git+https://git@source.vivoh.org/vivoh/nms.git":
+"node-media-server@git+https://oauth:XqmPhog7ty6sxvJxzz5b@source.vivoh.org/vivoh/nms.git":
   version "1.4.9"
-  resolved "git+https://git@source.vivoh.org/vivoh/nms.git#d63bf155ca3342dc0ffb1d03669443ebd2450780"
+  resolved "git+https://oauth:XqmPhog7ty6sxvJxzz5b@source.vivoh.org/vivoh/nms.git#d63bf155ca3342dc0ffb1d03669443ebd2450780"
   dependencies:
     basic-auth-connect "^1.0.0"
     chalk "^2.4.1"
@@ -5537,9 +5537,9 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-"vivoh-media-players@git+https://git@source.vivoh.org/vivoh/vivoh-media-players.git":
+"vivoh-media-players@git+https://oauth:XqmPhog7ty6sxvJxzz5b@source.vivoh.org/vivoh/vivoh-media-players.git":
   version "1.0.0"
-  resolved "git+https://git@source.vivoh.org/vivoh/vivoh-media-players.git#7d6428392ecc4983a5d2ee229275af3c00bab39d"
+  resolved "git+https://oauth:XqmPhog7ty6sxvJxzz5b@source.vivoh.org/vivoh/vivoh-media-players.git#39949dd5dfdf06420a466b94790fa0250ec50f6b"
 
 wcwidth@^1.0.0:
   version "1.0.1"
