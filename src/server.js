@@ -3,6 +3,7 @@ const w = require('./output').write;
 const express = require('express');
 const {setupRoutes} = require('./routes');
 const http = require('http');
+const https = require('https');
 
 let app;
 
@@ -25,7 +26,7 @@ const startServer = (module.exports.startServer = (config) => {
 
     console.log('port, ip', config.port, config.ipAddress);
 
-    if (config.crendentials) {
+    if (config.credentials) {
       server = https
           .createServer(config.credentials, app)
           .listen(config.port, config.ipAddress);

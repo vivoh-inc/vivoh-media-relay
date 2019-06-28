@@ -7,7 +7,8 @@
 	"pkg": {
 		"assets": [
 			"assets",
-			"node_modules/vivoh-media-players/assets"
+			"node_modules/vivoh-media-players/assets",
+			"certs"
 		]
 	},
 	"scripts": {
