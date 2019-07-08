@@ -25,11 +25,7 @@ module.exports.legend = () => {
   let rv = `
 ${'LEGEND'.dim}\n`;
 
-  if ( !useFfmpeg ) {
-    rv += `${startVlc()}: ${'Starting VLC process'.dim}\n`;
-  } else {
-    rv += `${startFfmpeg()}: ${'Starting ffmpeg process'.dim}\n`;
-  }
+  rv += `${startFfmpeg()}: ${'Starting ffmpeg process'.dim}\n`;
   rv += `${startServer()}: ${'started listening for playlist requests (HTTP server on)'.dim}\n`;
 
   rv += `${ready()}: ${'TS files and m3u8 file ready, broadcast started'.dim}
