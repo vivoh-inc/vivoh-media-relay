@@ -83,7 +83,7 @@ module.exports.processConfig = (processedArguments) => {
 
   config.credentials = processedArguments.e ? getCredentials(processedArguments.e) : undefined;
 
-  config.segmenter = config.useFfmpeg ? ffmpegSegmenter : vlcSegmenter;
+  config.segmenter = ffmpegSegmenter;
   config.overwrite = processedArguments.o;
   config.logFormat = processedArguments.l || processedArguments.logFormat;
 
