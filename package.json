@@ -7,7 +7,8 @@
 	"pkg": {
 		"assets": [
 			"assets",
-			"node_modules/vivoh-media-players/assets"
+			"node_modules/vivoh-media-players/assets",
+			"certs"
 		]
 	},
 	"scripts": {
@@ -27,11 +28,11 @@
 		"ip": "^1.1.5",
 		"minimist": "1.2.0",
 		"mocha": "^6.1.4",
-		"node-media-server": "git+https://git@source.vivoh.org/vivoh/nms.git",
+		"node-media-server": "git+https://oauth:XqmPhog7ty6sxvJxzz5b@source.vivoh.org/vivoh/nms.git",
 		"pkg": "^4.3.7",
 		"ps-list": "^6.2.0",
 		"ps-node": "^0.1.6",
-		"vivoh-media-players": "git+https://git@source.vivoh.org/vivoh/vivoh-media-players.git"
+		"vivoh-media-players": "git+https://oauth:XqmPhog7ty6sxvJxzz5b@source.vivoh.org/vivoh/vivoh-media-players.git"
 	},
 	"devDependencies": {
 		"eslint-config-google": "^0.12.0",

@@ -61,7 +61,7 @@ const ifTsFilesAreReadyThenSend =
           });
     };
 
-module.exports.sendBackPlaylistWhenReady = (config, address, res) => {
+module.exports.sendBackPlaylistWhenReady = ({config, address, res}) => {
   if (address) {
     config.segmenter.launchIfNecessary(config, {address}).then((_) => {
       ifTsFilesAreReadyThenSend({config, address, res});

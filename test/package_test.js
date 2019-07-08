@@ -7,6 +7,7 @@ describe( '#package.json', () => {
 	    [
           'assets',
           'node_modules/vivoh-media-players/assets',
+          'certs',
 	    ]);
   });
 });

@@ -32,6 +32,6 @@ module.exports.setupRoutes = ({type, app, config}) => {
 
   app.get('/index.m3u8', (req, res) => {
     const address = req.query.s;
-    sendBackPlaylistWhenReady(config, address, res);
+    sendBackPlaylistWhenReady({config, address, res});
   });
 };

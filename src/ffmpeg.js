@@ -87,7 +87,7 @@ const getFfmpegBinary = () => {
   if (process.platform === 'windows') {
     return 'ffmpeg.exe';
   } else if (process.platform === 'darwin') {
-    return '/usr/local/bin/ffmpeg';
+    return 'ffmpeg';
   } else if (process.platform === 'linux') {
     return 'ffmpeg';
   }

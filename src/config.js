@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const config = {};
-const vlcSegmenter = require('./vlc');
 const ffmpegSegmenter = require('./ffmpeg');
 
 module.exports.updateConfig = (key, value) => {
@@ -9,32 +8,47 @@ module.exports.updateConfig = (key, value) => {
   return config;
 };
 
-const getExtras = (args) => {
-  if (args.v) {
-    const e = {
-      extras: args.vlcExtras,
-      vlc: args.vlcBin,
-      log: args.vlcLogFile,
-    };
-    return e;
-  } else {
-    const e = {
-      extras: args.ffmpegExtras,
-      ffmpeg: args.ffmpegBin,
-      log: args.ffmpegLogFile,
-    };
-    return e;
+const getCredentials = (encrypted) => {
+  const credentials = {};
+  try {
+    let keyPath = path.join(__dirname, '..', 'certs', 'privatekey.pem');
+    let certificatePath = path.join(
+        __dirname,
+        '..',
+        'certs',
+        'certificate.pem'
+    );
+    credentials.key = fs.readFileSync(keyPath, 'utf8');
+    credentials.cert = fs.readFileSync(certificatePath, 'utf8');
+    if (typeof encrypted === 'string' && encrypted.indexOf(',') !== -1) {
+      // Using custom paths
+      const [a, b, c] = encrypted.split(',');
+      keyPath = a;
+      certificatePath = b;
+      const chain = c;
+      console.log('Using custom cert paths: ', keyPath, certificatePath, chain);
+      credentials.key = fs.readFileSync(keyPath, 'utf8');
+      credentials.cert = fs.readFileSync(certificatePath, 'utf8');
+      credentials.ca = fs.readFileSync(chain, 'utf8');
+    }
+  } catch (e) {
+    console.error('Unable to retrieve certificates', e.message);
   }
+  return credentials;
+};
+
+const getExtras = (args) => {
+  const e = {
+    extras: args.ffmpegExtras,
+    ffmpeg: args.ffmpegBin,
+    log: args.ffmpegLogFile,
+  };
+  return e;
 };
 
 module.exports.processConfig = (processedArguments) => {
   config.fixedDirectory = processedArguments.d;
-  config.useFfmpeg = config.useVlc = false;
-  if ( processedArguments.v ) {
-    config.useVlc = true;
-  } else {
-    config.useFfmpeg = true;
-  }
+  config.useFfmpeg = true;
   config.extras = getExtras(processedArguments);
   config.ipAddress = processedArguments.i || '0.0.0.0';
   config.port = processedArguments.p || 8888;
@@ -66,6 +80,8 @@ module.exports.processConfig = (processedArguments) => {
     // Fix it up.
     config.fixedDirectory = path.resolve(config.fixedDirectory);
   }
+
+  config.credentials = processedArguments.e ? getCredentials(processedArguments.e) : undefined;
 
   config.segmenter = config.useFfmpeg ? ffmpegSegmenter : vlcSegmenter;
   config.overwrite = processedArguments.o;
