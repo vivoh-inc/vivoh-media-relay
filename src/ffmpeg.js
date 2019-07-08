@@ -4,8 +4,7 @@ const path = require('path');
 const processFilter = require('./process_filter');
 const w = require('./output').write;
 const o = require('./output');
-const {getAppAndStreamFromAddress} = require('./address');
-// master pid for ffmpeg
+const _config = require('./config');
 const pids = {};
 
 const fs = require('fs');
@@ -28,22 +27,16 @@ module.exports.launchIfNecessary = function(config, dynamic) {
     }
 
     const {
-      type,
       fixedDirectory,
-      dontAddAacSwitches = false,
       extras,
-      rtmpPort,
-      flags,
     } = config;
 
     const {address} = dynamic;
 
-    const useHls = 'hls' === type;
-
-    if (useHls && !fixedDirectory) {
+    if (!fixedDirectory) {
       reject(
           new Error(
-              'Invalid HLS, need directory, internal error: ' + fixedDirectory
+              'Invalid directory, internal error: ' + fixedDirectory
           )
       );
     } else {
@@ -55,11 +48,7 @@ module.exports.launchIfNecessary = function(config, dynamic) {
             launchFfmpeg({
               extras,
               address,
-              useHls,
               fixedDirectory,
-              dontAddAacSwitches,
-              rtmpPort,
-              flags,
             })
           ) {
             resolve(true);
@@ -95,56 +84,27 @@ const getFfmpegBinary = () => {
 
 const getArgumentsForFfmpeg = module.exports.getArgumentsForFfmpeg = ({
   address,
-  useHls,
-  fixedDirectory,
-  rtmpPort,
-  flags,
-  dontAddAacSwitches = false,
+  fixedDirectory = _config.DEFAULT_FIXED_DIRECTORY,
   extras,
-  source,
 } = {}) => {
   if (!address) {
     return {};
   }
 
-  const {app, stream} = getAppAndStreamFromAddress(address);
-
-  const exe = (extras && extras.ffmpegBin) || getFfmpegBinary();
-  let ffArgs = ['-i', address];
+  const exe = (extras && extras.bin) || getFfmpegBinary();
+  let args = ['-i', address];
 
   if (extras && extras.extras) {
-    ffArgs = ffArgs.concat(extras.extras.split(' '));
+    args = args.concat(extras.extras.split(' '));
+  } else {
+    args = args.concat(['-codec', 'copy', '-hls_flags', 'delete_segments']);
   }
   if (extras && extras.log) {
     logFile = extras.log;
   }
 
-  if (useHls) {
-    if (flags) {
-      ffArgs = ffArgs.concat(flags.split(' '));
-    } else {
-      ffArgs = ffArgs.concat(
-          ['-codec', 'copy', '-hls_flags', 'delete_segments'],
-          path.join(fixedDirectory, 'redirect.m3u8')
-      );
-    }
-  } else {
-    if (flags) {
-      ffArgs = ffArgs.concat(flags.split(' '));
-    } else {
-      ffArgs = ffArgs.concat(['-c', 'copy', '-f', 'flv']);
-      if (!dontAddAacSwitches) {
-        ffArgs = ffArgs.concat('-bsf:a', 'aac_adtstoasc');
-      }
-    }
-
-    const url = source
-      ? source
-      : `rtmp://localhost${rtmpPort ? ':' + rtmpPort : ''}/${app}/${stream}`;
-    ffArgs = ffArgs.concat(url);
-  }
-
-  return {args: ffArgs, exe};
+  args.push(path.join(fixedDirectory, 'redirect.m3u8'));
+  return {args, exe};
 };
 
 const launchFfmpeg = (module.exports.launchFfmpeg = (ffmpegConfig) => {

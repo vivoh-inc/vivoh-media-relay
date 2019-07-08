@@ -40,7 +40,7 @@ const getCredentials = (encrypted) => {
 const getExtras = (args) => {
   const e = {
     extras: args.ffmpegExtras,
-    ffmpeg: args.ffmpegBin,
+    bin: args.ffmpegBin,
     log: args.ffmpegLogFile,
   };
   return e;
@@ -65,7 +65,7 @@ module.exports.processConfig = (processedArguments) => {
   config.extras = getExtras(processedArguments);
 
   if (!config.fixedDirectory) {
-    config.fixedDirectory = './vivoh_media_relay';
+    config.fixedDirectory = this.DEFAULT_FIXED_DIRECTORY;
     // Make it if not there.
     if (!fs.existsSync(config.fixedDirectory)) {
       fs.mkdirSync(config.fixedDirectory);
@@ -89,3 +89,6 @@ module.exports.processConfig = (processedArguments) => {
 
   return config;
 };
+
+
+module.exports.DEFAULT_FIXED_DIRECTORY = './vivoh_media_relay';
