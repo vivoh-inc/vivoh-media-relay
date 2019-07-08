@@ -6,7 +6,7 @@
 
 ## Required components
 
-Needs VLC (or Ffmpeg) installed.
+Needs FFmpeg installed.
 
 ## Command line options
 
@@ -14,8 +14,6 @@ Needs VLC (or Ffmpeg) installed.
 -p port of local web server ... eg "8888"
 -i IP address to bind to.
 -d temporary directory for TS files
--v use VLC as segmenter (default)
--f use Ffmpeg as segmenter
 ```
 
 
