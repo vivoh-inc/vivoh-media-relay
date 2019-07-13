@@ -1,22 +1,13 @@
 /* eslint-disable max-len */
 const colors = require('colors'); // eslint-disable-line no-unused-vars
 const ready = module.exports.ready = () => '.'.green.bold;
-const startVlc = module.exports.startVlc = () => '!'.red.bold;
 const startFfmpeg = module.exports.startFfmpeg = () => '*'.red.bold;
 const startServer = module.exports.startServer = () => '🛫'.red.bold;
 const holding = module.exports.holding = () => '@'.yellow.bold;
 const {version} = require( './version');
 
-let useFfmpeg = module.exports.useFfmpeg = true;
-
 module.exports.write = (t) => {
   process.stdout.write(t);
-};
-module.exports.port = undefined;
-
-module.exports.setupOutputOptions = (config) => {
-  useFfmpeg = config.useFfmpeg;
-  port = config.port;
 };
 
 module.exports.banner = () => console.log(`\n\n${'Vivoh Media Relay'.rainbow} ${version.red}`);

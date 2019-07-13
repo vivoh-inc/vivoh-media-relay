@@ -4,7 +4,6 @@ const dirUtils = require('./dir_utils');
 const mime = require('./mime');
 const o = require('./output');
 const w = require( './output').write;
-const {getAddress} = require( './address');
 
 const RETRY_MAX = 60;
 let config;
@@ -19,19 +18,6 @@ const sendRedirectFile =
     res.send(contents);
   };
 
-const startRtmpRelay = module.exports.startRtmpRelay = (address) => {
-  if (address) {
-    config.segmenter.launchIfNecessary(config, {address});
-  }
-};
-
-module.exports.rtmpRelayStartMiddleware = (req, _, next) => {
-  const address = getAddress(req);
-  if (address) {
-    startRtmpRelay(address);
-  }
-  next();
-};
 
 const ifTsFilesAreReadyThenSend =
   module.exports.ifTsFilesAreReadyThenSend =

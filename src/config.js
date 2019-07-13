@@ -3,6 +3,9 @@ const path = require('path');
 const config = {};
 const ffmpegSegmenter = require('./ffmpeg');
 
+module.exports.DEFAULT_FIXED_DIRECTORY = './vivoh_media_relay';
+module.exports.DEFAULT_POLLING_TIME = 60;
+
 module.exports.updateConfig = (key, value) => {
   config[key] = value;
   return config;
@@ -48,20 +51,12 @@ const getExtras = (args) => {
 
 module.exports.processConfig = (processedArguments) => {
   config.fixedDirectory = processedArguments.d;
-  config.useFfmpeg = true;
   config.extras = getExtras(processedArguments);
   config.ipAddress = processedArguments.i || '0.0.0.0';
   config.port = processedArguments.p || 8888;
-
-  config.segmenter = undefined;
-
-  if (processedArguments.ffmpegDontAddAacSwitches) {
-    config.dontAddAacSwitches = true;
-  }
   config.valid = true;
   config.type = 'hls';
 
-  // config.useFfmpeg;
   config.extras = getExtras(processedArguments);
 
   if (!config.fixedDirectory) {
@@ -81,14 +76,23 @@ module.exports.processConfig = (processedArguments) => {
     config.fixedDirectory = path.resolve(config.fixedDirectory);
   }
 
-  config.credentials = processedArguments.e ? getCredentials(processedArguments.e) : undefined;
-
+  config.credentials = processedArguments.e
+    ? getCredentials(processedArguments.e)
+    : undefined;
   config.segmenter = ffmpegSegmenter;
   config.overwrite = processedArguments.o;
   config.logFormat = processedArguments.l || processedArguments.logFormat;
 
+  // Polling
+  // -t polling time in seconds to check to see if a live event has started
+  //   eg "600"
+  // -u url to polling info site that will return "on" or "off"
+  //   eg "http://foo.com/status.txt"
+  config.pollUrl = processedArguments.u;
+  if (config.pollUrl) {
+    config.pollingTime =
+      processedArguments.t || module.exports.DEFAULT_POLLING_TIME;
+  }
+
   return config;
 };
-
-
-module.exports.DEFAULT_FIXED_DIRECTORY = './vivoh_media_relay';

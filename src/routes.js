@@ -3,19 +3,13 @@ const express = require('express');
 const {sendBackPlaylistWhenReady} = require('./playlist');
 const vivohMediaPlayers = require('vivoh-media-players');
 
-module.exports.setupRoutes = ({type, app, config}) => {
-  app.use((req, res, next) => {
+module.exports.setupRoutes = ({type = 'hls', app, config}) => {
+  app.use((_, res, next) => {
     res.set('Access-Control-Allow-Origin', '*');
     next();
   });
 
-  app.get('/pid/:pid', (req, res) => {
-    const {pid} = req.params;
-    console.log('params:', req.params);
-    respondWithProgram(res, pid);
-  });
-
-  app.get(`/${type}.html`, (req, res) => {
+  app.get(`/${type}.html`, (_, res) => {
     const fullPath = path.resolve(vivohMediaPlayers[type].playerPath());
     res.sendFile(fullPath);
   });
