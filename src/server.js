@@ -49,7 +49,7 @@ const startServer = module.exports.startServer = (config) => {
         .createServer(config.credentials, app)
         .listen(config.port, config.ipAddress);
     } else {
-      o.write(`Starting server: ${config.ipAddress}:${config.port}\n`);
+      o.write(`\n\nStarting server: ${config.ipAddress}:${config.port}\n\n`);
       server = http
         .createServer(app)
         .listen(config.port, config.ipAddress); // , () => { console.log( "We are on!")});
@@ -83,7 +83,7 @@ const stopServer = module.exports.stopServer = () => {
     w(o.stopServer());
     app = undefined;
     server = undefined;
-    console.log( "Server stopped.");
+    console.log( "\n\nServer stopped.\n\n");
   }
   serverStatus.on = false;
 };
