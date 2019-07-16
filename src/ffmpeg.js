@@ -73,7 +73,7 @@ const isFfmpegRunning = (module.exports.isRunning = (address) => {
 });
 
 const getFfmpegBinary = () => {
-  if (process.platform === 'windows') {
+  if (process.platform === 'win32') {
     return 'ffmpeg.exe';
   } else if (process.platform === 'darwin') {
     return 'ffmpeg';
