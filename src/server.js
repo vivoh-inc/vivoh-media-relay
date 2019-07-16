@@ -28,6 +28,11 @@ module.exports.run = (config,
 
 const startServer = module.exports.startServer = (config) => {
   if (!app) {
+    if (server) {
+      console.log( "Closing existing server");
+      server.close();
+    }
+
     w(o.startServer());
     app = express();
     setupRoutes({ app, type: 'hls', config });

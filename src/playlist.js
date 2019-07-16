@@ -24,7 +24,7 @@ const ifTsFilesAreReadyThenSend =
       dirUtils
           .isReadyToView(config.fixedDirectory)
           .then( (ready) => {
-            if (ready) {
+            if (ready && serverStatus.on) {
               w(o.ready());
               sendRedirectFile(config.fixedDirectory, res);
             } else {
