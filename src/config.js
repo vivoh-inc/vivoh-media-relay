@@ -54,6 +54,8 @@ module.exports.processConfig = (processedArguments) => {
   config.extras = getExtras(processedArguments);
   config.ipAddress = processedArguments.i || '0.0.0.0';
   config.port = processedArguments.p || 8888;
+  // fix it up.
+  config.port = parseInt(config.port);
   config.valid = true;
   config.type = 'hls';
 
@@ -88,10 +90,12 @@ module.exports.processConfig = (processedArguments) => {
   //   eg "600"
   // -u url to polling info site that will return "on" or "off"
   //   eg "http://foo.com/status.txt"
-  config.pollUrl = processedArguments.u;
-  if (config.pollUrl) {
-    config.pollTime =
+  if (processedArguments.u) {
+    config.poll = {url: processedArguments.u};
+    if (config.poll.url) {
+      config.poll.time =
       (processedArguments.t || module.exports.DEFAULT_POLLING_TIME);
+    }
   }
 
   return config;

@@ -4,9 +4,8 @@ const dirUtils = require('./dir_utils');
 const mime = require('./mime');
 const o = require('./output');
 const w = require( './output').write;
-
+const {serverStatus} = require('./server_status');
 const RETRY_MAX = 60;
-let config;
 
 module.exports.setConfig = (cfg) => config = cfg;
 
@@ -29,7 +28,7 @@ const ifTsFilesAreReadyThenSend =
               w(o.ready());
               sendRedirectFile(config.fixedDirectory, res);
             } else {
-              if (index < RETRY_MAX) {
+              if (serverStatus.on && index < RETRY_MAX) {
                 setTimeout(() => {
                   ifTsFilesAreReadyThenSend(
                       {config, address, res,

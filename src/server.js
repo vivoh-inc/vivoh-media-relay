@@ -5,6 +5,8 @@ const axios = require('axios');
 const o = require('./output');
 const w = require('./output').write;
 const { setupRoutes } = require('./routes');
+const {DEFAULT_POLLING_TIME} = require('./config');
+const {serverStatus} = require('./server_status');
 
 let app;
 let server;
@@ -13,11 +15,11 @@ module.exports.run = (config,
     {_checkPollServerForStatus, _startServer} =
     {_checkPollServerForStatus: checkPollServerForStatus,
       _startServer: startServer }) => {
-  if (config.pollUrl) {
-    console.log('POLL'.bold + ' (timeout ' + config.pollTime + ' secs)');
+  if (config.poll && config.poll.url) {
+    o.write('POLL'.bold + ' (timeout ' + config.poll.time + ' secs)\n');
   }
 
-  if (config.pollUrl) {
+  if (config.poll && config.poll.url) {
     _checkPollServerForStatus(config);
   } else {
     _startServer(config);
@@ -42,8 +44,13 @@ const startServer = module.exports.startServer = (config) => {
         .createServer(config.credentials, app)
         .listen(config.port, config.ipAddress);
     } else {
-      server = http.createServer(app).listen(config.port, config.ipAddress);
+      o.write(`Starting server: ${config.ipAddress}:${config.port}\n`);
+      server = http
+        .createServer(app)
+        .listen(config.port, config.ipAddress); // , () => { console.log( "We are on!")});
     }
+
+    serverStatus.on = true;
   }
 };
 
@@ -69,10 +76,11 @@ const stopServer = module.exports.stopServer = () => {
   if (app && server) {
     server.close();
     w(o.stopServer());
-    console.log(`\nShutting down server\n`);
+    app = undefined;
+    server = undefined;
+    console.log( "Server stopped.");
   }
-  app = undefined;
-  server = undefined;
+  serverStatus.on = false;
 };
 
 const checkPollServerForStatus =
@@ -86,7 +94,7 @@ const checkPollServerForStatus =
       _stopServer: stopServer } ) => {
 
     _axios
-    .get(config.pollUrl)
+    .get(config.poll.url)
     .then(response => {
       if (response.data) {
         const dynamic = _processResponse(response);
@@ -94,7 +102,13 @@ const checkPollServerForStatus =
           isOn = dynamic.isOn;
           if (isOn) {
             w(o.pollServerOn());
-            _startServer({...config, ...dynamic});
+            const carefullyMerged = {...config};
+            Object.keys(dynamic).forEach( k => {
+              if (dynamic[k]) { 
+                carefullyMerged[k] = dynamic[k] 
+              };
+            });
+            _startServer(carefullyMerged);
           } else {
             w(o.pollServerOff());
             _stopServer();
@@ -107,10 +121,12 @@ const checkPollServerForStatus =
       }
     })
     .catch(error => {
+      console.log( "Got an error: ", error );
       w(o.pollServerFailure(error));
+      _stopServer();
     });
 
   _setTimeout(() => {
     checkPollServerForStatus(config);
-  }, config.pollTime * 1000);
+  }, (config.poll.time || DEFAULT_POLLING_TIME) * 1000);
 };

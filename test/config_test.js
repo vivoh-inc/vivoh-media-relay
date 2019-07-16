@@ -23,6 +23,13 @@ describe('#config', () => {
     });
   });
 
+  it('should get the port correctly, either string or not', () => {
+    const config = processConfig({p: '7777'});
+    expect(config.port).toBe(7777);
+    const config2 = processConfig({p: 7777});
+    expect(config2.port).toBe(7777);
+  });
+
   it('should get ffmpeg by default', () => {
     const args = {};
     const config = processConfig(args);
@@ -33,13 +40,13 @@ describe('#config', () => {
     const args = {t: 345, u: 'http://polling.com/foo.json'};
     const config = processConfig(args);
     // Convert to seconds
-    expect(config.pollingTime).toBe(345*1000);
-    expect(config.pollUrl).toBe('http://polling.com/foo.json');
+    expect(config.poll.time).toBe(345);
+    expect(config.poll.url).toBe('http://polling.com/foo.json');
   });
 
   it('should have def polling time if polling server is on', () => {
     const args = {u: 'http://polling.com/foo.json'};
     const config = processConfig(args);
-    expect(config.pollingTime).toBe(DEFAULT_POLLING_TIME*1000);
+    expect(config.poll.time).toBe(DEFAULT_POLLING_TIME);
   });
 });
