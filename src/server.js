@@ -1,31 +1,34 @@
-const o = require('./output');
-const w = require('./output').write;
 const express = require('express');
-const { setupRoutes } = require('./routes');
 const http = require('http');
 const https = require('https');
+const axios = require('axios');
+const o = require('./output');
+const w = require('./output').write;
+const { setupRoutes } = require('./routes');
 
 let app;
+let server;
 
 module.exports.run = (config,
-    {_checkPollServerForStatus = checkPollServerForStatus,
-    _startServer = startServer}) => {
+    {_checkPollServerForStatus, _startServer} =
+    {_checkPollServerForStatus: checkPollServerForStatus,
+      _startServer: startServer }) => {
   if (config.pollUrl) {
-    console.log('POLL'.bold + ' (timeout ' + config.pollTime + 'secs)');
+    console.log('POLL'.bold + ' (timeout ' + config.pollTime + ' secs)');
   }
 
   if (config.pollUrl) {
-    _checkPollServerForStatus();
+    _checkPollServerForStatus(config);
   } else {
     _startServer(config);
   }
 };
 
-const startServer = module.exports.startServer = config => {
+const startServer = module.exports.startServer = (config) => {
   if (!app) {
     w(o.startServer());
     app = express();
-    setupRoutes({ app, type: config.type, config });
+    setupRoutes({ app, type: 'hls', config });
     app.use(
       express.static(config.fixedDirectory, {
         setHeaders: (res, _, __) => {
@@ -33,8 +36,6 @@ const startServer = module.exports.startServer = config => {
         }
       })
     );
-
-    console.log('port, ip', config.port, config.ipAddress);
 
     if (config.credentials) {
       server = https
@@ -63,29 +64,53 @@ const processResponse = module.exports.processReponse = (response) => {
   return { isOn, redirect, url, port, flags, credentials};
 }
 
-const checkPollServerForStatus = (config,
-  {_axios, _setTimeout} = { _axios: axios, _setTimeout: setTimeout } ) => {
-  _axios
+
+const stopServer = module.exports.stopServer = () => {
+  if (app && server) {
+    server.close();
+    w(o.stopServer());
+    console.log(`\nShutting down server\n`);
+  }
+  app = undefined;
+  server = undefined;
+};
+
+const checkPollServerForStatus =
+  module.exports.checkPollServerForStatus = (config,
+    // These lines are only overriden inside tests
+    {_axios, _setTimeout, _processResponse, _startServer, _stopServer} =
+    { _axios: axios,
+      _setTimeout: setTimeout,
+      _processResponse: processResponse,
+      _startServer: startServer,
+      _stopServer: stopServer } ) => {
+
+    _axios
     .get(config.pollUrl)
     .then(response => {
       if (response.data) {
-        const dynamic = processResponse(response);
-
-        isOn = dynamic.isOn;
-        if (isOn) {
-          w(o.pollServerOn());
-          startServer({...config, ...dynamic});
-        } else {
+        const dynamic = _processResponse(response);
+        if (dynamic) {
+          isOn = dynamic.isOn;
+          if (isOn) {
+            w(o.pollServerOn());
+            _startServer({...config, ...dynamic});
+          } else {
+            w(o.pollServerOff());
+            _stopServer();
+          }
+        }
+        else {
           w(o.pollServerOff());
-          stopServer();
+          _stopServer();
         }
       }
     })
     .catch(error => {
-      w(o.pollServerFailure());
+      w(o.pollServerFailure(error));
     });
 
   _setTimeout(() => {
-    checkPollServerForStatus();
-  }, pollTime * 1000);
+    checkPollServerForStatus(config);
+  }, config.pollTime * 1000);
 };

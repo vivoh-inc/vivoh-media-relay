@@ -25,3 +25,7 @@ ${holding()}: ${'holding for the TS files to be ready'.dim}
 
   return rv;
 };
+
+module.exports.pollServerFailure = () => '↯'.red.bold;
+module.exports.pollServerOn = () => '📻'.green.bold;
+module.exports.pollServerOff = () => '🚫'.red.bold;

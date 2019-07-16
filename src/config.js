@@ -90,8 +90,8 @@ module.exports.processConfig = (processedArguments) => {
   //   eg "http://foo.com/status.txt"
   config.pollUrl = processedArguments.u;
   if (config.pollUrl) {
-    config.pollingTime =
-      processedArguments.t || module.exports.DEFAULT_POLLING_TIME;
+    config.pollTime =
+      (processedArguments.t || module.exports.DEFAULT_POLLING_TIME);
   }
 
   return config;

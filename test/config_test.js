@@ -32,13 +32,14 @@ describe('#config', () => {
   it('should support polling args', () => {
     const args = {t: 345, u: 'http://polling.com/foo.json'};
     const config = processConfig(args);
-    expect(config.pollingTime).toBe(345);
+    // Convert to seconds
+    expect(config.pollingTime).toBe(345*1000);
     expect(config.pollUrl).toBe('http://polling.com/foo.json');
   });
 
   it('should have def polling time if polling server is on', () => {
     const args = {u: 'http://polling.com/foo.json'};
     const config = processConfig(args);
-    expect(config.pollingTime).toBe(DEFAULT_POLLING_TIME);
+    expect(config.pollingTime).toBe(DEFAULT_POLLING_TIME*1000);
   });
 });
