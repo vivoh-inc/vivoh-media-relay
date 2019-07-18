@@ -1,5 +1,6 @@
 const {spawn} = require('child_process');
 const psList = require('ps-list');
+const tasklist = require('tasklist');
 const path = require('path');
 const processFilter = require('./process_filter');
 const w = require('./output').write;
@@ -8,6 +9,9 @@ const _config = require('./config');
 const pids = {};
 
 const fs = require('fs');
+
+const isWindows = process.platform === 'win32';
+const listProcesses = (isWindows ? tasklist : psList);
 
 let logFile = undefined;
 const writeLog = (m) => {
@@ -64,7 +68,7 @@ module.exports.launchIfNecessary = function(config, dynamic) {
 const isFfmpegRunning = (module.exports.isRunning = (address) => {
   return new Promise((resolve, reject) => {
     const pid = pids[address];
-    psList()
+    listProcesses()
         .then((processes) => {
           resolve(processFilter.pidIsRunning(processes, pid));
         })
