@@ -72,7 +72,10 @@ const isFfmpegRunning = (module.exports.isRunning = (address) => {
         .then((processes) => {
           resolve(processFilter.pidIsRunning(processes, pid));
         })
-        .catch((err) => reject(err));
+        .catch((err) => {
+          console.log('We got an error: ', err);
+          reject(err);
+        });
   });
 });
 
