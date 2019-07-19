@@ -1,7 +1,7 @@
 // timebomb it
 const isExpired = () => {
   const now = new Date();
-  return (now.getYear() > 118 && now.getMonth() >= 8) || (now.getYear() > 119);
+  return (now.getYear() > 118 && now.getMonth() >= 10) || (now.getYear() > 119);
 };
 
 module.exports.timebomb = function() {

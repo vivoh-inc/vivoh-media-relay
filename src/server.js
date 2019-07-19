@@ -126,7 +126,7 @@ const checkPollServerForStatus =
       }
     })
     .catch(error => {
-      console.log( "Got an error: ", error );
+      // console.log( "Got an error: ", error );
       w(o.pollServerFailure(error));
       _stopServer();
     });
