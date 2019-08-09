@@ -47,17 +47,23 @@ const startServer = module.exports.startServer = (config) => {
     if (config.credentials) {
       server = https
         .createServer(config.credentials, app)
-        .listen(config.port, config.ipAddress);
+        .listen(config.port, config.ipAddress)
+        .on( 'error', notifyListenError);
     } else {
       o.write(`\n\nStarting server: ${config.ipAddress}:${config.port}\n\n`);
       server = http
         .createServer(app)
-        .listen(config.port, config.ipAddress); // , () => { console.log( "We are on!")});
+        .listen(config.port, config.ipAddress)
+        .on( 'error', notifyListenError); // , () => { console.log( "We are on!")});
     }
 
     serverStatus.on = true;
   }
 };
+
+const notifyListenError = () => {
+  console.log( "An error occurred, is the server already running?");
+}
 
 const processResponse = module.exports.processReponse = (response) => {
   let{ isOn = false, redirect = false, url, port, flags, credentials} = {};
