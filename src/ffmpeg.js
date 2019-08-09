@@ -107,8 +107,11 @@ const getArgumentsForFfmpeg = (module.exports.getArgumentsForFfmpeg = ({
   return { args, exe };
 });
 
+const connectedStreams = {};
+
 const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
   const { args, exe } = getArgumentsForFfmpeg(ffmpegConfig);
+  const { address } = ffmpegConfig;
 
   if (!(exe && args)) {
     return false;
@@ -122,6 +125,9 @@ const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
       writeLog(e);
     });
     ffmpeg.stdout.on('data', data => {
+      // if (!connectedStreams[address]) {
+      //   connectedStreams[address] = true;
+      // }
       // console.log(`FFMPEG： ${data}`);
     });
     ffmpeg.stderr.on('data', data => {
@@ -129,7 +135,10 @@ const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
     });
     ffmpeg.on('close', code => {
       writeLog(`FFMPEG close: ${code}`);
+      connectedStreams[address] = false;
     });
+
+    console.log( "Connected to multicast stream:", address );
 
     pids[ffmpegConfig.address] = ffmpeg.pid;
 
