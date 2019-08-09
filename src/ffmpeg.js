@@ -1,4 +1,4 @@
-const {spawn} = require('child_process');
+const { spawn } = require('child_process');
 const psList = require('ps-list');
 const tasklist = require('tasklist');
 const path = require('path');
@@ -11,12 +11,12 @@ const pids = {};
 const fs = require('fs');
 
 const isWindows = process.platform === 'win32';
-const listProcesses = (isWindows ? tasklist : psList);
+const listProcesses = isWindows ? tasklist : psList;
 
 let logFile = undefined;
-const writeLog = (m) => {
+const writeLog = m => {
   if (logFile) {
-    fs.appendFile(logFile, m, (err) => {
+    fs.appendFile(logFile, m, err => {
       // console.error( "Unable to write to: ", logFile );
     });
   }
@@ -30,21 +30,14 @@ module.exports.launchIfNecessary = function(config, dynamic) {
       reject(new Error('Invalid arguments provided, internal error.'));
     }
 
-    const {
-      fixedDirectory,
-      extras,
-    } = config;
+    const { fixedDirectory, extras } = config;
 
-    const {address} = dynamic;
+    const { address } = dynamic;
 
     if (!fixedDirectory) {
-      reject(
-          new Error(
-              'Invalid directory, internal error: ' + fixedDirectory
-          )
-      );
+      reject(new Error('Invalid directory, internal error: ' + fixedDirectory));
     } else {
-      isFfmpegRunning(address).then((running) => {
+      isFfmpegRunning(address).then(running => {
         if (running) {
           resolve(true);
         } else {
@@ -52,7 +45,7 @@ module.exports.launchIfNecessary = function(config, dynamic) {
             launchFfmpeg({
               extras,
               address,
-              fixedDirectory,
+              fixedDirectory
             })
           ) {
             resolve(true);
@@ -65,17 +58,17 @@ module.exports.launchIfNecessary = function(config, dynamic) {
   });
 };
 
-const isFfmpegRunning = (module.exports.isRunning = (address) => {
+const isFfmpegRunning = (module.exports.isRunning = address => {
   return new Promise((resolve, reject) => {
     const pid = pids[address];
     listProcesses()
-        .then((processes) => {
-          resolve(processFilter.pidIsRunning(processes, pid));
-        })
-        .catch((err) => {
-          console.log('We got an error: ', err);
-          reject(err);
-        });
+      .then(processes => {
+        resolve(processFilter.pidIsRunning(processes, pid));
+      })
+      .catch(err => {
+        console.log('We got an error: ', err);
+        reject(err);
+      });
   });
 });
 
@@ -89,10 +82,10 @@ const getFfmpegBinary = () => {
   }
 };
 
-const getArgumentsForFfmpeg = module.exports.getArgumentsForFfmpeg = ({
+const getArgumentsForFfmpeg = (module.exports.getArgumentsForFfmpeg = ({
   address,
   fixedDirectory = _config.DEFAULT_FIXED_DIRECTORY,
-  extras,
+  extras
 } = {}) => {
   if (!address) {
     return {};
@@ -111,11 +104,11 @@ const getArgumentsForFfmpeg = module.exports.getArgumentsForFfmpeg = ({
   }
 
   args.push(path.join(fixedDirectory, 'redirect.m3u8'));
-  return {args, exe};
-};
+  return { args, exe };
+});
 
-const launchFfmpeg = (module.exports.launchFfmpeg = (ffmpegConfig) => {
-  const {args, exe} = getArgumentsForFfmpeg(ffmpegConfig);
+const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
+  const { args, exe } = getArgumentsForFfmpeg(ffmpegConfig);
 
   if (!(exe && args)) {
     return false;
@@ -125,16 +118,16 @@ const launchFfmpeg = (module.exports.launchFfmpeg = (ffmpegConfig) => {
     writeLog(fullCommand);
     // console.log(log);
     const ffmpeg = spawn(exe, args);
-    ffmpeg.on('error', (e) => {
+    ffmpeg.on('error', e => {
       writeLog(e);
     });
-    ffmpeg.stdout.on('data', (data) => {
+    ffmpeg.stdout.on('data', data => {
       // console.log(`FFMPEG： ${data}`);
     });
-    ffmpeg.stderr.on('data', (data) => {
+    ffmpeg.stderr.on('data', data => {
       writeLog(data);
     });
-    ffmpeg.on('close', (code) => {
+    ffmpeg.on('close', code => {
       writeLog(`FFMPEG close: ${code}`);
     });
 
@@ -145,3 +138,17 @@ const launchFfmpeg = (module.exports.launchFfmpeg = (ffmpegConfig) => {
     return true;
   }
 });
+
+module.exports.checkForFfmpeg = config => {
+  // Test for ffmpeg, use a fake address to get the args correctly.
+  return new Promise((resolve, reject) => {
+    const { exe } = getArgumentsForFfmpeg({ ...config, address: 'x.x.x.x' });
+    const ffmpeg = spawn(exe);
+    ffmpeg.on('error', _ => {
+      reject(exe);
+    });
+    ffmpeg.on('close', _ => {
+      resolve();
+    });
+  });
+};
