@@ -71,7 +71,7 @@ describe('#server', () => {
     });
 
     it.skip('should check the poll server and process the result', () => {
-      const response = {data:'on'};
+      const response = {data: 'on'};
       const _axios = {get: sinon.stub().resolves(response)};
       const _startServer = sinon.spy();
       _processResponse.returns({isOn: true});
@@ -83,7 +83,7 @@ describe('#server', () => {
     });
 
     it.skip('should check the poll server and not process if off', () => {
-      const response = {data:'off'};
+      const response = {data: 'off'};
       const _axios = {get: sinon.stub().resolves(response)};
       const _stopServer = sinon.spy();
       _processResponse.returns({isOn: false});
@@ -107,7 +107,5 @@ describe('#server', () => {
       expect( _processResponse.callCount).toBe(0);
       expect( _stopServer.callCount).toBe(1);
     });
-
-
   });
 });

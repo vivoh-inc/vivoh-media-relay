@@ -24,7 +24,7 @@ describe('#ffmpeg', () => {
           '-hls_flags',
           'delete_segments',
           'vivoh_media_relay/redirect.m3u8',
-        ]
+        ],
       });
     });
 
@@ -41,8 +41,26 @@ describe('#ffmpeg', () => {
           '-foobar',
           '-barfoo',
           'vivoh_media_relay/redirect.m3u8',
-        ]
+        ],
       });
+    });
+  });
+
+  describe('#checkForFfmpeg', () => {
+    it('should see if things work with faked make', (done) => {
+      ffmpeg.checkForFfmpeg({extras: {bin: 'make'}}).then((_) => {
+        expect(true).toBeTruthy();
+        done();
+      });
+    });
+
+    it('should fail if binary is not real', (done) => {
+      ffmpeg
+          .checkForFfmpeg({extras: {bin: '123123098091309138'}})
+          .catch((_) => {
+            expect(true).toBeTruthy();
+            done();
+          });
     });
   });
 });

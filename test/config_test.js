@@ -5,7 +5,7 @@ describe('#config', () => {
   it('process a config generally', () => {
     const args = {
       l: 'fdgds/sdfsfd',
-      d: 'abc'
+      d: 'abc',
     };
     const config = processConfig(args);
     expect(config).toBeTruthy();
@@ -18,7 +18,7 @@ describe('#config', () => {
     });
 
     it('should allow specifying it', () => {
-      const config = processConfig({ i: '192.168.1.1' });
+      const config = processConfig({i: '192.168.1.1'});
       expect(config.ipAddress).toBe('192.168.1.1');
     });
   });
