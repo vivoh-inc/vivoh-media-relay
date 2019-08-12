@@ -6,6 +6,9 @@ const vivohMediaPlayers = require('vivoh-media-players');
 
 module.exports.setupRoutes = ({type = 'hls', app, config}) => {
   app.use((_, res, next) => {
+    res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+    res.header('Expires', '-1');
+    res.header('Pragma', 'no-cache');
     res.set('Access-Control-Allow-Origin', '*');
     next();
   });
@@ -15,10 +18,7 @@ module.exports.setupRoutes = ({type = 'hls', app, config}) => {
     res.sendFile(fullPath);
   });
 
-  app.use('/player', express.static(path.join(__dirname, '..', 'assets')), {
-    etag: false,
-    maxage: '1s',
-  });
+  app.use('/player', express.static(path.join(__dirname, '..', 'assets')));
 
   app.get('/crossdomain.xml', (req, res) => {
     res.type('text/x-cross-domain-policy');
