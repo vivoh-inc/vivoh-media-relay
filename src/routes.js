@@ -1,6 +1,7 @@
 const path = require('path');
 const express = require('express');
 const {sendBackPlaylistWhenReady} = require('./playlist');
+const {convertPathToAddress} = require('./address');
 const vivohMediaPlayers = require('vivoh-media-players');
 
 module.exports.setupRoutes = ({type = 'hls', app, config}) => {
@@ -28,4 +29,11 @@ module.exports.setupRoutes = ({type = 'hls', app, config}) => {
     const address = req.query.s;
     sendBackPlaylistWhenReady({config, address, res});
   });
+
+  app.get('/:path/index.m3u8', (req, res) => {
+    const address = convertPathToAddress(req.params.path);
+    sendBackPlaylistWhenReady({config, address, res});
+  });
+
+
 };
