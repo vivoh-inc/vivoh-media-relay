@@ -15,7 +15,10 @@ module.exports.setupRoutes = ({type = 'hls', app, config}) => {
     res.sendFile(fullPath);
   });
 
-  app.use('/player', express.static(path.join(__dirname, '..', 'assets')));
+  app.use('/player', express.static(path.join(__dirname, '..', 'assets')), {
+    etag: false,
+    maxage: '1s',
+  });
 
   app.get('/crossdomain.xml', (req, res) => {
     res.type('text/x-cross-domain-policy');
@@ -34,6 +37,4 @@ module.exports.setupRoutes = ({type = 'hls', app, config}) => {
     const address = convertPathToAddress(req.params.path);
     sendBackPlaylistWhenReady({config, address, res});
   });
-
-
 };
