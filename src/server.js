@@ -5,6 +5,7 @@ const axios = require('axios');
 const o = require('./output');
 const w = require('./output').write;
 const { setupRoutes } = require('./routes');
+const {killFfmpegProcesses} = require('./ffmpeg');
 const {DEFAULT_POLLING_TIME} = require('./config');
 const {serverStatus} = require('./server_status');
 
@@ -90,6 +91,7 @@ const stopServer = module.exports.stopServer = () => {
     app = undefined;
     server = undefined;
     console.log( "\n\nServer stopped.\n\n");
+    killFfmpegProcesses();
   }
   serverStatus.on = false;
 };
