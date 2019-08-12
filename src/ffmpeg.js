@@ -1,6 +1,7 @@
 const { spawn } = require('child_process');
 const psList = require('ps-list');
 const tasklist = require('tasklist');
+const ps = require('ps-node');
 const path = require('path');
 const processFilter = require('./process_filter');
 const w = require('./output').write;
@@ -23,6 +24,18 @@ const writeLog = m => {
 };
 
 module.exports.name = 'ffmpeg';
+
+module.exports.killFfmpegProcesses = _ => {
+  const _pids = Object.values(pids);
+
+  _pids.forEach(pid => {
+    if (pid) {
+      ps.kill(pid, err => {
+        console.log('Error killing ffmpeg process:', err);
+      });
+    }
+  });
+};
 
 module.exports.launchIfNecessary = function(config, dynamic) {
   return new Promise((resolve, reject) => {
@@ -138,7 +151,7 @@ const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
       connectedStreams[address] = false;
     });
 
-    console.log( "Connected to multicast stream:", address );
+    console.log('Connected to multicast stream:', address);
 
     pids[ffmpegConfig.address] = ffmpeg.pid;
 
