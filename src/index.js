@@ -6,6 +6,9 @@ const {banner} = require('./output');
 const {usage} = require('./usage');
 const {checkForFfmpeg} = require('./ffmpeg');
 
+// Update path to add cwd
+process.env.PATH = `${process.env.PATH}:.`;
+
 const config = processConfig(processedArguments);
 
 checkForFfmpeg(config)
