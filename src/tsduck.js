@@ -14,21 +14,9 @@ const fs = require('fs');
 const isWindows = process.platform === 'win32';
 const listProcesses = isWindows ? tasklist : psList;
 
-// Under consideration, ignore this comment
-let logFile = 'tsp.log';
-const writeLog = m => {
-  if (logFile) {
-    date = new Date();
-    fs.appendFile(logFile, `${date}:  ${m}`, err => {
-      // console.error( "Unable to write to: ", logFile );
-    }, `\n`);
-  }
-};
-
 module.exports.name = 'tsduck';
 
 module.exports.killTSDuckProcesses = _ => {
-  console.debug("\nEntered tsduck:killTSDuckProcesses");
   const _pids = Object.values(pids);
 
   _pids.forEach(pid => {
@@ -41,7 +29,6 @@ module.exports.killTSDuckProcesses = _ => {
 };
 
 module.exports.launchIfNecessary = function(config, dynamic) {
-  console.debug("\nEntered tsduck:launchIfNecessary");
   return new Promise((resolve, reject) => {
     if (!(config && Object.keys(config).length != 0 && config.ipAddress)) {
       reject(new Error('Invalid arguments provided, internal error.'));
@@ -54,7 +41,6 @@ module.exports.launchIfNecessary = function(config, dynamic) {
     if (!fixedDirectory) {
       reject(new Error('Invalid directory, internal error: ' + fixedDirectory));
     } else {
-      console.debug(`In tsduck.js:launchIfNecessary.  address: ${address}`);
       isTSDuckRunning(address).then(running => {
         if (running) {
           resolve(true);
@@ -77,7 +63,6 @@ module.exports.launchIfNecessary = function(config, dynamic) {
 };
 
 const isTSDuckRunning = (module.exports.isRunning = address => {
-  console.debug("\nEntered tsduck:isTSDuckRunning");
   return new Promise((resolve, reject) => {
     const pid = pids[address];
     listProcesses()
@@ -92,7 +77,6 @@ const isTSDuckRunning = (module.exports.isRunning = address => {
 });
 
 const getTSDuckBinary = () => {
-  console.debug("\nEntered tsduck:getTSDuckBinary");
   if (process.platform === 'win32') {
     return 'tsp.exe';
   } else if (process.platform === 'darwin') {
@@ -107,26 +91,16 @@ const getArgumentsForTSDuck = (module.exports.getArgumentsForTSDuck = ({
   fixedDirectory = _config.DEFAULT_FIXED_DIRECTORY,
   extras
 } = {}) => {
-  console.log(`\nEntered tsduck.js:getArgumentsForTSDuck.\naddress=${address}\nfixedDirectory=${fixedDirectory}`);
-  console.log(extras);//util.inspect(extras, {showHidden: false, depth: null}));
   if (!address) {
     return {};
   }
-  console.log('About to define exe');
   const exe = (extras && extras.bin) || getTSDuckBinary();
-  console.log(`exe=${exe}`);
 
   let args = ['-I', 'ip', address];
 
   if (extras && extras.extras) {
-    console.log('Setting args');
     args = args.concat(extras.extras.split(' '));
-    console.log('args:', args);
   } else {
-    console.log('extras did not have any extras');
-    //args = args.concat(['-codec', 'copy', '-hls_flags', 'delete_segments']);
-    //args = args.concat(['-codec', 'copy', '-hls_flags', 'delete_segments']);
-    console.log('About to update args');
     /*-I ip 239.0.0.1:1234 -O hls redirect-.ts -p redirect.m3u8*/
     args = args.concat(['-O', 'hls', path.join(fixedDirectory, 'redirect-.ts')]);
     args = args.concat(['-p', path.join(fixedDirectory, 'redirect.m3u8')]);
@@ -136,7 +110,6 @@ const getArgumentsForTSDuck = (module.exports.getArgumentsForTSDuck = ({
   if (extras && extras.log) {
     logFile = extras.log;
   }
-  
   //args.push(path.join(fixedDirectory, 'redirect.m3u8'));
   //writeLog(`tsduck with args: ${exe} ${args.join(' ')}\n`);
 
@@ -146,7 +119,6 @@ const getArgumentsForTSDuck = (module.exports.getArgumentsForTSDuck = ({
 const connectedStreams = {};
 
 const launchTSDuck = (module.exports.launchTSDuck = tsduckConfig => {
-  console.debug('\nEntered tsduck:launchTSDuck');
   const { args, exe } = getArgumentsForTSDuck(tsduckConfig);
   const { address } = tsduckConfig;
 
@@ -157,10 +129,8 @@ const launchTSDuck = (module.exports.launchTSDuck = tsduckConfig => {
     if (args.includes('rtp://239.0.0.1:1234'))
     {
       args[args.indexOf('rtp://239.0.0.1:1234')] = '239.0.0.1:1234';
-      console.debug(`Update args: ${args.join(' ')}`);
       fullCommand = `\n\ntsduck command: ${exe} ${args.join(' ')}\n\n`;
     }
-    console.debug(fullCommand);
     // console.log(log);
     const tsduck = spawn(exe, args);
     tsduck.on('error', e => {
@@ -190,9 +160,8 @@ const launchTSDuck = (module.exports.launchTSDuck = tsduckConfig => {
   }
 });
 
-module.exports.checkForTSDuck = config => {
+module.exports.checkForBinary = config => {
   // Test for tsduck, use a fake address to get the args correctly.
-  console.debug('\nEntered tsduck:checkForTSDuck');
   return new Promise((resolve, reject) => {
     // We seem to have an issue here if we use a fake address!
     console.debug('Caling getArgumentsForTSDuck');

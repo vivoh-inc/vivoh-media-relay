@@ -11,6 +11,39 @@ describe('#config', () => {
     expect(config).toBeTruthy();
   });
 
+  describe('#segmenter', () => {
+    it( 'should get the ffmpeg ', () => {
+      const config = processConfig({});
+      expect(config.segmenterName).toBe('ffmpeg');
+    });
+
+    it( 'should get tsduck if we ask for it ', () => {
+      const config = processConfig({s: 'tsduck'});
+      expect(config.segmenterName).toBe('tsduck');
+      expect(config.segmenter.checkForBinary).toBeTruthy();
+    });
+
+    it( 'should get ffmpeg if we ask for it ', () => {
+      const config = processConfig({s: 'ffmpeg'});
+      expect(config.segmenterName).toBe('ffmpeg');
+      expect(config.segmenter.checkForBinary).toBeTruthy();
+    });
+  });
+
+  describe('#extras', () => {
+    it( 'should get the ffmpeg extras ', () => {
+      const config = processConfig({ ffmpegExtras: '-b -c', ffmpegBin: 'ffmpeg.exe'});
+      expect(config.extras.extras).toBe('-b -c');
+      expect(config.extras.bin).toBe('ffmpeg.exe');
+    });
+  
+    it( 'should get the tsduck extras ', () => {
+      const config = processConfig({ s: 'tsduck', tsduckExtras: '-b -c', tsduckBin: 'tsduck.APP'});
+      expect(config.extras.extras).toBe('-b -c');
+      expect(config.extras.bin).toBe('tsduck.APP');
+    });
+  });
+
   describe('#ipAddress', () => {
     it('should get 0.0.0.0 by default', () => {
       const config = processConfig({});

@@ -161,7 +161,7 @@ const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
   }
 });
 
-module.exports.checkForFfmpeg = config => {
+module.exports.checkForBinary = config => {
   // Test for ffmpeg, use a fake address to get the args correctly.
   return new Promise((resolve, reject) => {
     const { exe } = getArgumentsForFfmpeg({ ...config, address: 'x.x.x.x' });

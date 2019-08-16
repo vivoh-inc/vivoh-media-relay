@@ -1,14 +1,14 @@
 const path = require('path');
 const express = require('express');
-const { sendBackPlaylistWhenReady } = require('./playlist');
-const { convertPathToAddress } = require('./address');
+const {sendBackPlaylistWhenReady} = require('./playlist');
+const {convertPathToAddress} = require('./address');
 const vivohMediaPlayers = require('vivoh-media-players');
 const ip = require('ip');
-const { isRunning } = require('./ffmpeg');
+const {isRunning} = require('./ffmpeg');
 
 let currentAddress;
 
-module.exports.setupRoutes = ({ type = 'hls', app, config }) => {
+module.exports.setupRoutes = ({type = 'hls', app, config}) => {
   app.use((_, res, next) => {
     res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
     res.header('Expires', '-1');
@@ -49,11 +49,11 @@ module.exports.setupRoutes = ({ type = 'hls', app, config }) => {
 
   app.get('/index.m3u8', (req, res) => {
     const address = (currentAddress = req.query.s);
-    sendBackPlaylistWhenReady({ config, address, res });
+    sendBackPlaylistWhenReady({config, address, res});
   });
 
   app.get('/:path/index.m3u8', (req, res) => {
     const address = (currentAddress = convertPathToAddress(req.params.path));
-    sendBackPlaylistWhenReady({ config, address, res });
+    sendBackPlaylistWhenReady({config, address, res});
   });
 };

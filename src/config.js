@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const config = {};
 const ffmpegSegmenter = require('./ffmpeg');
+const tsduckSegmenter = require('./tsduck');
 
 module.exports.DEFAULT_FIXED_DIRECTORY = './vivoh_media_relay';
 module.exports.DEFAULT_POLLING_TIME = 60;
@@ -40,8 +41,13 @@ const getCredentials = (encrypted) => {
   return credentials;
 };
 
-const getExtras = (args) => {
-  const e = {
+const getExtras = (args, name) => {
+  const e = name === 'tsduck' ? {
+    extras: args.tsduckExtras,
+    bin: args.tsduckBin,
+    log: args.tsduckLogFile,
+  } :
+  {
     extras: args.ffmpegExtras,
     bin: args.ffmpegBin,
     log: args.ffmpegLogFile,
@@ -50,8 +56,11 @@ const getExtras = (args) => {
 };
 
 module.exports.processConfig = (processedArguments) => {
+  if (!processedArguments) {
+    throw 'No arguments were provided to configuration, error!';
+  }
+
   config.fixedDirectory = processedArguments.d;
-  config.extras = getExtras(processedArguments);
   config.ipAddress = processedArguments.i || '0.0.0.0';
   config.port = processedArguments.p || 8888;
   // fix it up.
@@ -81,7 +90,10 @@ module.exports.processConfig = (processedArguments) => {
   config.credentials = processedArguments.e
     ? getCredentials(processedArguments.e)
     : undefined;
-  config.segmenter = ffmpegSegmenter;
+
+  config.segmenterName = processedArguments.s !== 'tsduck' ? 'ffmpeg' : 'tsduck';
+  config.segmenter = config.segmenterName === 'ffmpeg' ? ffmpegSegmenter : tsduckSegmenter;
+  config.extras = getExtras(processedArguments, config.segmenterName);
   config.overwrite = processedArguments.o;
   config.logFormat = processedArguments.l || processedArguments.logFormat;
 
