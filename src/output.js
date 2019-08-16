@@ -2,6 +2,7 @@
 const colors = require('colors'); // eslint-disable-line no-unused-vars
 const ready = module.exports.ready = () => '.'.green.bold;
 const startFfmpeg = module.exports.startFfmpeg = () => '*'.red.bold;
+const startTSDuck = module.exports.startTSDuck = () => '*'.red.bold;
 const startServer = module.exports.startServer = () => '🛫'.red.bold;
 const stopServer = module.exports.stopServer = () => '🛬'.blue.bold;
 const holding = module.exports.holding = () => '@'.yellow.bold;
@@ -20,7 +21,8 @@ module.exports.legend = () => {
   let rv = `
 ${'LEGEND'.dim}\n`;
 
-  rv += `${startFfmpeg()}: ${'Starting ffmpeg process'.dim}\n`;
+  // rv += `${startFfmpeg()}: ${'Starting ffmpeg process'.dim}\n`;
+  rv += `${startTSDuck()}: ${'Starting tsduck process'.dim}\n`;
   rv += `${startServer()}: ${'started listening for playlist requests (HTTP server on)'.dim}\n`;
 
   rv += `${ready()}: ${'TS files and m3u8 file ready, broadcast started'.dim}
