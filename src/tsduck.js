@@ -131,7 +131,8 @@ const launchTSDuck = (module.exports.launchTSDuck = tsduckConfig => {
       args[args.indexOf('rtp://239.0.0.1:1234')] = '239.0.0.1:1234';
       fullCommand = `\n\ntsduck command: ${exe} ${args.join(' ')}\n\n`;
     }
-    // console.log(log);
+    console.log(log);
+    console.log(fullCommand);
     const tsduck = spawn(exe, args);
     tsduck.on('error', e => {
       console.error(e);
@@ -143,10 +144,10 @@ const launchTSDuck = (module.exports.launchTSDuck = tsduckConfig => {
       // console.log(`TSDuck ${data}`);
     });
     tsduck.stderr.on('data', data => {
-      console.debug(data);
+      // console.debug(data);
     });
     tsduck.on('close', code => {
-      console.debug(`TSDUCK close: ${code}`);
+      // console.debug(`TSDUCK close: ${code}`);
       connectedStreams[address] = false;
     });
 
