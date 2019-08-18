@@ -20,6 +20,6 @@ config.segmenter.checkForBinary(config)
         run(config);
       }
     })
-    .catch( _ => {
+    .catch( (_) => {
       console.log('An error occurred runinng the segmenter');
     });

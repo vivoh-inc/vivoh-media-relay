@@ -48,7 +48,7 @@ describe('#ffmpeg', () => {
 
   describe('#checkForFfmpeg', () => {
     it('should see if things work with faked make', (done) => {
-      ffmpeg.checkForFfmpeg({extras: {bin: 'make'}}).then((_) => {
+      ffmpeg.checkForBinary({extras: {bin: 'make'}}).then((_) => {
         expect(true).toBeTruthy();
         done();
       });
@@ -56,7 +56,7 @@ describe('#ffmpeg', () => {
 
     it('should fail if binary is not real', (done) => {
       ffmpeg
-          .checkForFfmpeg({extras: {bin: '123123098091309138'}})
+          .checkForBinary({extras: {bin: '123123098091309138'}})
           .catch((_) => {
             expect(true).toBeTruthy();
             done();

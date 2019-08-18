@@ -116,22 +116,26 @@ const getArgumentsForTSDuck = (module.exports.getArgumentsForTSDuck = ({
   return { args, exe };
 });
 
+const reformatArguments = (module.exports.reformatArguments = (args) => {
+  // var fullCommand = `\n\ntsduck command: ${exe} ${args.join(' ')}\n\n`;
+  if (args.includes('rtp://239.0.0.1:1234'))
+  {
+    args[args.indexOf('rtp://239.0.0.1:1234')] = '239.0.0.1:1234';
+    // fullCommand = `\n\ntsduck command: ${exe} ${args.join(' ')}\n\n`;
+  }
+});
+
 const connectedStreams = {};
 
-const launchTSDuck = (module.exports.launchTSDuck = tsduckConfig => {
-  const { args, exe } = getArgumentsForTSDuck(tsduckConfig);
-  const { address } = tsduckConfig;
+const launchTSDuck = (module.exports.launchTSDuck = config => {
+  const { args, exe } = getArgumentsForTSDuck(config);
+  const { address } = config;
 
   if (!(exe && args)) {
     return false;
   } else {
-    var fullCommand = `\n\ntsduck command: ${exe} ${args.join(' ')}\n\n`;
-    if (args.includes('rtp://239.0.0.1:1234'))
-    {
-      args[args.indexOf('rtp://239.0.0.1:1234')] = '239.0.0.1:1234';
-      fullCommand = `\n\ntsduck command: ${exe} ${args.join(' ')}\n\n`;
-    }
-    // console.log(log);
+    reformatArguments(args);
+    // console.log( "TSDUCK: ", exe, args);
     const tsduck = spawn(exe, args);
     tsduck.on('error', e => {
       console.error(e);
@@ -143,16 +147,16 @@ const launchTSDuck = (module.exports.launchTSDuck = tsduckConfig => {
       // console.log(`TSDuck ${data}`);
     });
     tsduck.stderr.on('data', data => {
-      console.debug(data);
+      // console.debug(data);
     });
     tsduck.on('close', code => {
-      console.debug(`TSDUCK close: ${code}`);
+      // console.debug(`TSDUCK close: ${code}`);
       connectedStreams[address] = false;
     });
 
     console.log('Connected to multicast stream:', address);
 
-    pids[tsduckConfig.address] = tsduck.pid;
+    pids[address] = tsduck.pid;
 
     w(o.startTSDuck());
 
@@ -164,13 +168,13 @@ module.exports.checkForBinary = config => {
   // Test for tsduck, use a fake address to get the args correctly.
   return new Promise((resolve, reject) => {
     // We seem to have an issue here if we use a fake address!
-    console.debug('Caling getArgumentsForTSDuck');
+    // console.debug('Caling getArgumentsForTSDuck');
     const { args, exe } = getArgumentsForTSDuck({ ...config, address: '239.0.0.1' });
-    console.debug(`Returned from calling getArgumentsForTSDuck: ${exe}\n`);
-    console.debug(`Returned from calling getArgumentsForTSDuck: ${args.join(' ')}\n`);
+    // console.debug(`Returned from calling getArgumentsForTSDuck: ${exe}\n`);
+    // console.debug(`Returned from calling getArgumentsForTSDuck: ${args.join(' ')}\n`);
     const tsduck = spawn(exe, args);//, {detached: true});
     
-    console.debug('Spawned tsduck object');//, tsduck);
+    // console.debug('Spawned tsduck object');//, tsduck);
     /*if (isTSDuckRunning && args.includes('x.x.x.x'))
     {
       console.debug('tsduck is running');  
@@ -193,16 +197,20 @@ module.exports.checkForBinary = config => {
       console.log('Error spawning tsduck.');
       reject(exe);
     });
+
+    // This code seems a little strange. It is trying to figure out if we have the binary
+    // and it works. I'm not sure why we would call resolve in all cases (since that should
+    // exit the promise, right?).
     tsduck.on('close', (code, signal) => {
-      console.log(`Message on close on spawning tsduck: ${code}: ${signal}\n`);
+      // console.log(`Message on close on spawning tsduck: ${code}: ${signal}\n`);
       resolve();
     });
     tsduck.on('exit', (number, string) => {
-      console.log(`Message on exit on spawning tsduck: ${number}: ${string}\n`);
+      // console.log(`Message on exit on spawning tsduck: ${number}: ${string}\n`);
       resolve();
     });
     tsduck.on('message', (message, sendHandle) => {
-      console.log(`Message on spawning tsduck.\nmessage: ${message}\nsendHandle: ${sendHandle}`);
+      // console.log(`Message on spawning tsduck.\nmessage: ${message}\nsendHandle: ${sendHandle}`);
       resolve();
     });
   });
