@@ -118,9 +118,9 @@ const getArgumentsForTSDuck = (module.exports.getArgumentsForTSDuck = ({
 
 const connectedStreams = {};
 
-const launchTSDuck = (module.exports.launchTSDuck = tsduckConfig => {
-  const { args, exe } = getArgumentsForTSDuck(tsduckConfig);
-  const { address } = tsduckConfig;
+const launchTSDuck = (module.exports.launchTSDuck = config => {
+  const { args, exe } = getArgumentsForTSDuck(config);
+  const { address } = config;
 
   if (!(exe && args)) {
     return false;
@@ -131,7 +131,7 @@ const launchTSDuck = (module.exports.launchTSDuck = tsduckConfig => {
       args[args.indexOf('rtp://239.0.0.1:1234')] = '239.0.0.1:1234';
       fullCommand = `\n\ntsduck command: ${exe} ${args.join(' ')}\n\n`;
     }
-    console.log(log);
+    // console.log(log);
     console.log(fullCommand);
     const tsduck = spawn(exe, args);
     tsduck.on('error', e => {
@@ -153,7 +153,7 @@ const launchTSDuck = (module.exports.launchTSDuck = tsduckConfig => {
 
     console.log('Connected to multicast stream:', address);
 
-    pids[tsduckConfig.address] = tsduck.pid;
+    pids[config.address] = tsduck.pid;
 
     w(o.startTSDuck());
 

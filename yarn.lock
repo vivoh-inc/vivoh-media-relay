@@ -5722,7 +5722,7 @@ verror@1.10.0:
 
 "vivoh-media-players@git+https://oauth:XqmPhog7ty6sxvJxzz5b@source.vivoh.org/vivoh/vivoh-media-players.git":
   version "1.0.0"
-  resolved "git+https://oauth:XqmPhog7ty6sxvJxzz5b@source.vivoh.org/vivoh/vivoh-media-players.git#fb65ee3cf45c3728d076d6a4069c77a195137d95"
+  resolved "git+https://oauth:XqmPhog7ty6sxvJxzz5b@source.vivoh.org/vivoh/vivoh-media-players.git#c71e0896eff8c2c6f5e8b953a2827e1b67697750"
 
 wcwidth@^1.0.0:
   version "1.0.1"
