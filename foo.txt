@@ -1,3 +1,0 @@
-frame= 4441 fps= 24 q=-1.0 size=N/A time=00:03:06.51 bitrate=N/A speed=   1x    frame= 4453 fps= 24 q=-1.0 size=N/A time=00:03:07.01 bitrate=N/A speed=   1x    frame= 4466 fps= 24 q=-1.0 size=N/A time=00:03:07.55 bitrate=N/A speed=   1x    frame= 4477 fps= 24 q=-1.0 size=N/A time=00:03:08.01 bitrate=N/A speed=   1x    [hls @ 0x55cc746593c0] Opening 'vivoh_media_relay/redirect94.ts' for writing
-[hls @ 0x55cc746593c0] Opening 'vivoh_media_relay/redirect.m3u8.tmp' for writing
-frame= 4490 fps= 24 q=-1.0 size=N/A time=00:03:08.55 bitrate=N/A speed=   1x    frame= 4503 fps= 24 q=-1.0 size=N/A time=00:03:09.09 bitrate=N/A speed=   1x    
