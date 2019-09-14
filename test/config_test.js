@@ -32,13 +32,13 @@ describe('#config', () => {
 
   describe('#extras', () => {
     it( 'should get the ffmpeg extras ', () => {
-      const config = processConfig({ ffmpegExtras: '-b -c', ffmpegBin: 'ffmpeg.exe'});
+      const config = processConfig({ffmpegExtras: '-b -c', ffmpegBin: 'ffmpeg.exe'});
       expect(config.extras.extras).toBe('-b -c');
       expect(config.extras.bin).toBe('ffmpeg.exe');
     });
-  
+
     it( 'should get the tsduck extras ', () => {
-      const config = processConfig({ s: 'tsduck', tsduckExtras: '-b -c', tsduckBin: 'tsduck.APP'});
+      const config = processConfig({s: 'tsduck', tsduckExtras: '-b -c', tsduckBin: 'tsduck.APP'});
       expect(config.extras.extras).toBe('-b -c');
       expect(config.extras.bin).toBe('tsduck.APP');
     });

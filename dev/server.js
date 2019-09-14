@@ -15,6 +15,11 @@ app.get('/', (req, res) => {
     : res.send(on ? 'on' : 'off');
 });
 
+app.get('/ffmpeg', (_, res) => {
+  const response = { on, mcastUrl: 'rtp://239.0.0.1:1234', programId: '12345'};
+  res.json(response);
+});
+
 app.listen(port, '0.0.0.0', () => console.log('Sample server ready'));
 
 console.log('"q" to quit, "o" to toggle on or off');

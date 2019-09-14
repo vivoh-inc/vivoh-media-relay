@@ -127,6 +127,7 @@ const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
   const { address } = ffmpegConfig;
 
   if (!(exe && args)) {
+    console.log( 'NOPE!');
     return false;
   } else {
     const fullCommand = `\n\nffmpeg command: ${exe} ${args.join(' ')}\n\n`;
