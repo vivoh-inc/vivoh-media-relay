@@ -16,18 +16,28 @@ const listProcesses = isWindows ? tasklist : psList;
 
 module.exports.name = 'tsduck';
 
-module.exports.killProcesses = module.exports.killTSDuckProcesses = _ => {
+module.exports.killProcesses = _ => {
   const _pids = Object.values(pids);
 
+  const killed = [];
   _pids.forEach(pid => {
     if (pid) {
       ps.kill(pid, err => {
-        console.log('Error killing tsduck process:', err);
+        if (err) {
+          console.log('Error killing tsduck process');
+        }
+        else {
+          killed.push(pid);
+        }
       });
-      delete pids[pid];
     }
   });
+
+  killed.forEach( k => {
+    delete pids[k];
+  });
 };
+
 
 module.exports.launchIfNecessary = function(config, dynamic) {
   return new Promise((resolve, reject) => {
