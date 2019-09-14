@@ -5,7 +5,7 @@ const {convertPathToAddress, getAddress} = require('./address');
 const vivohMediaPlayers = require('vivoh-media-players');
 const ip = require('ip');
 const {isRunning} = require('./ffmpeg');
-const { getProgram } = require('./programs');
+const {getProgram} = require('./programs');
 
 let currentAddress;
 
@@ -22,15 +22,15 @@ module.exports.setupRoutes = ({type = 'hls', app, config}) => {
     const fullPath = path.resolve(vivohMediaPlayers[type].playerPath());
     res.sendFile(fullPath);
   });
-  
+
   app.get('/data*', (req, res) => {
     isRunning(currentAddress).then( (ffmpegOn) => {
       res.json({
-        Version: '1.3.4', 
+        Version: '1.3.4',
         VersionUpdated: '2019-08-29',
-        Status: 'OK', 
-        IPAddress: ip.address(), 
-        FFmpegIsOn:  (ffmpegOn ? 'on' : 'off')}
+        Status: 'OK',
+        IPAddress: ip.address(),
+        FFmpegIsOn: (ffmpegOn ? 'on' : 'off')}
       );
     });
   });
@@ -64,7 +64,7 @@ module.exports.setupRoutes = ({type = 'hls', app, config}) => {
     let address = (currentAddress = getAddress(req.originalUrl));
     if (req.params.pid) {
       address = getProgram(req.query.pid);
-      console.log( "Address is:", address );
+      console.log( 'Address is:', address );
     }
 
     sendBackPlaylistWhenReady({config, address, res});
@@ -74,7 +74,7 @@ module.exports.setupRoutes = ({type = 'hls', app, config}) => {
     let address = (currentAddress = convertPathToAddress(req.params.path));
     if (req.params.pid) {
       address = getProgram(req.query.pid);
-      console.log( "Address is:", address );
+      console.log( 'Address is:', address );
     }
     sendBackPlaylistWhenReady({config, address, res});
   });

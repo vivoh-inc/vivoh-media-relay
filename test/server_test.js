@@ -152,7 +152,6 @@ describe('#server', () => {
         expect(_stopServer.callCount).toBe(1);
       });
     });
-
   });
 
   describe( '#processResponse', () => {
