@@ -25,7 +25,7 @@ const writeLog = m => {
 
 module.exports.name = 'ffmpeg';
 
-module.exports.killFfmpegProcesses = _ => {
+module.exports.killProcesses = module.exports.killFfmpegProcesses = _ => {
   const _pids = Object.values(pids);
 
   _pids.forEach(pid => {
@@ -33,6 +33,7 @@ module.exports.killFfmpegProcesses = _ => {
       ps.kill(pid, err => {
         console.log('Error killing ffmpeg process:', err);
       });
+      delete pids[pid];
     }
   });
 };

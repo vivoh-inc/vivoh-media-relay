@@ -16,7 +16,7 @@ const listProcesses = isWindows ? tasklist : psList;
 
 module.exports.name = 'tsduck';
 
-module.exports.killTSDuckProcesses = _ => {
+module.exports.killProcesses = module.exports.killTSDuckProcesses = _ => {
   const _pids = Object.values(pids);
 
   _pids.forEach(pid => {
@@ -24,6 +24,7 @@ module.exports.killTSDuckProcesses = _ => {
       ps.kill(pid, err => {
         console.log('Error killing tsduck process:', err);
       });
+      delete pids[pid];
     }
   });
 };
