@@ -5,7 +5,7 @@ const axios = require('axios');
 const o = require('./output');
 const w = require('./output').write;
 const { setupRoutes } = require('./routes');
-const { killFfmpegProcesses } = require('./ffmpeg');
+const { killFfmpegProcesses, launchIfNecessary } = require('./ffmpeg');
 const { DEFAULT_POLLING_TIME } = require('./config');
 const { serverStatus } = require('./server_status');
 
@@ -75,20 +75,27 @@ const notifyListenError = () => {
 };
 
 const processResponse = (module.exports.processReponse = response => {
-  let { isOn = false, redirect = false, url, port, flags, credentials } = {};
+  let { isOn = false, redirect = false, url, port, flags, credentials, programId, mcastUrl, startDateTime, endDateTime, pollInterval } = {};
   if (typeof response.data === 'object') {
     if (response.data.on) {
       isOn = true;
       redirect = 'redirect' === response.data.type;
-      url = response.data.source;
+      url = response.data.url;
+      source = response.data.source;
       port = response.data.port;
       flags = response.data.flags;
       credentials = response.data.credentials;
+      programId = response.data.programId;
+      mcastUrl = response.data.mcastUrl;
+      startDateTime = response.data.startDateTime;
+      endDateTime = response.data.endDateTime;
+      pollInterval = response.data.pollInterval;
     }
   } else if (0 === response.data.indexOf('on')) {
     isOn = true;
   }
-  return { isOn, redirect, url, port, flags, credentials };
+
+  return { isOn, redirect, url, port, flags, credentials,  programId, mcastUrl, startDateTime, endDateTime, pollInterval  };
 });
 
 const stopServer = (module.exports.stopServer = () => {
@@ -106,15 +113,16 @@ const stopServer = (module.exports.stopServer = () => {
 const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
   config,
   // These lines are only overriden inside tests
-  { _axios, _setTimeout, _processResponse, _startServer, _stopServer } = {
+  { _axios, _setTimeout, _processResponse, _startServer, _stopServer, _loop } = {
     _axios: axios,
     _setTimeout: setTimeout,
     _processResponse: processResponse,
     _startServer: startServer,
-    _stopServer: stopServer
+    _stopServer: stopServer,
+    _loop: true,
   }
 ) => {
-  _axios
+  const promise = _axios
     .get(config.poll.url)
     .then(response => {
       if (response.data) {
@@ -130,13 +138,20 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
               }
             });
             _startServer(carefullyMerged);
+
+            if (hasProgram(carefullyMerged)) {
+              const dynamic = convertCarefullyMergedToDynamic(carefullyMerged);
+              config.segmenter.launchIfNecessary(config, dynamic);
+            }
           } else {
             w(o.pollServerOff());
+            config.segmenter.killFfmpegProcesses();
             _stopServer();
           }
         } else {
           w(o.pollServerOff());
           _stopServer();
+          config.segmenter.killFfmpegProcesses();
         }
       }
     })
@@ -146,7 +161,20 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
       _stopServer();
     });
 
-  _setTimeout(() => {
-    checkPollServerForStatus(config);
-  }, (config.poll.time || DEFAULT_POLLING_TIME) * 1000);
+  if (_loop) {
+    _setTimeout(() => checkPollServerForStatus(config),
+      (config.poll.time || DEFAULT_POLLING_TIME) * 1000);
+  } else {
+    return promise;
+  }
 });
+
+const convertCarefullyMergedToDynamic = (merged) => {
+  const dynamic = {};
+  dynamic.address = merged.mcastUrl;
+  return dynamic;
+}
+
+const hasProgram = module.exports.hasProgram = config => {
+  return (config.mcastUrl && config.programId);
+}

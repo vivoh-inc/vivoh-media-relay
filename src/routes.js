@@ -5,6 +5,7 @@ const {convertPathToAddress, getAddress} = require('./address');
 const vivohMediaPlayers = require('vivoh-media-players');
 const ip = require('ip');
 const {isRunning} = require('./ffmpeg');
+const { getProgram } = require('./programs');
 
 let currentAddress;
 
@@ -39,7 +40,7 @@ module.exports.setupRoutes = ({type = 'hls', app, config}) => {
 
   app.use('/player', express.static(path.join(__dirname, '..', 'assets')));
 
-  app.get('/crossdomain.xml', (req, res) => {
+  app.get('/crossdomain.xml', (_, res) => {
     res.type('text/x-cross-domain-policy');
     res.send(`<?xml version="1.0" ?>
       <cross-domain-policy>
@@ -48,13 +49,21 @@ module.exports.setupRoutes = ({type = 'hls', app, config}) => {
   });
 
   app.get('/index.m3u8', (req, res) => {
-    const address = (currentAddress = getAddress(req.originalUrl));
-    // const address = (currentAddress = req.query.s);
+    let address = (currentAddress = getAddress(req.originalUrl));
+    if (req.params.pid) {
+      address = getProgram(req.query.pid);
+      console.log( "Address is:", address );
+    }
+
     sendBackPlaylistWhenReady({config, address, res});
   });
 
   app.get('/:path/index.m3u8', (req, res) => {
-    const address = (currentAddress = convertPathToAddress(req.params.path));
+    let address = (currentAddress = convertPathToAddress(req.params.path));
+    if (req.params.pid) {
+      address = getProgram(req.query.pid);
+      console.log( "Address is:", address );
+    }
     sendBackPlaylistWhenReady({config, address, res});
   });
 };

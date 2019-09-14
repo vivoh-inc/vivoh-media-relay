@@ -21,7 +21,7 @@ module.exports.legend = () => {
   let rv = `
 ${'LEGEND'.dim}\n`;
 
-  // rv += `${startFfmpeg()}: ${'Starting ffmpeg process'.dim}\n`;
+  rv += `${startFfmpeg()}: ${'Starting ffmpeg process'.dim}\n`;
   rv += `${startTSDuck()}: ${'Starting tsduck process'.dim}\n`;
   rv += `${startServer()}: ${'started listening for playlist requests (HTTP server on)'.dim}\n`;
 
