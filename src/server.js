@@ -5,7 +5,6 @@ const axios = require('axios');
 const o = require('./output');
 const w = require('./output').write;
 const { setupRoutes } = require('./routes');
-const { killFfmpegProcesses, launchIfNecessary } = require('./ffmpeg');
 const { DEFAULT_POLLING_TIME } = require('./config');
 const { serverStatus } = require('./server_status');
 
@@ -98,14 +97,14 @@ const processResponse = (module.exports.processReponse = response => {
   return { isOn, redirect, url, port, flags, credentials,  programId, mcastUrl, startDateTime, endDateTime, pollInterval  };
 });
 
-const stopServer = (module.exports.stopServer = () => {
+const stopServer = (module.exports.stopServer = (config) => {
   if (app && server) {
     server.close();
     w(o.stopServer());
     app = undefined;
     server = undefined;
     console.log('\n\nServer stopped.\n\n');
-    killFfmpegProcesses();
+    config.segmenter.killProcesses();
   }
   serverStatus.on = false;
 });
@@ -146,11 +145,11 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
           } else {
             w(o.pollServerOff());
             config.segmenter.killFfmpegProcesses();
-            _stopServer();
+            _stopServer(config);
           }
         } else {
           w(o.pollServerOff());
-          _stopServer();
+          _stopServer(config);
           config.segmenter.killFfmpegProcesses();
         }
       }
@@ -158,7 +157,7 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
     .catch(error => {
       // console.log( "Got an error: ", error );
       w(o.pollServerFailure(error));
-      _stopServer();
+      _stopServer(config);
     });
 
   if (_loop) {
