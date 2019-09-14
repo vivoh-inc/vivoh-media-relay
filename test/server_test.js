@@ -92,6 +92,31 @@ describe('#server', () => {
       });
     });
 
+    it('should check the poll server and start ffmpeg if configured as such', (done) => {
+      const response = {data: 'on'};
+      const _axios = {get: sinon.stub().resolves(response)};
+      const _startServer = sinon.spy();
+      const launchIfNecessary = sinon.spy();
+      _processResponse.returns({isOn: true, mcastUrl: 'udp://239.0.0.1:1234', programId: 65432});
+      const testOverrides = {
+        _setTimeout,
+        _processResponse,
+        _axios,
+        _startServer,
+        _loop: false,
+      };
+      checkPollServerForStatus(
+          {poll: {url: 'http://foobar.com/foo.json'},
+            segmenter: {launchIfNecessary}},
+          testOverrides
+      ).then((_) => {
+        expect(_startServer.callCount).toBe(1);
+        expect(launchIfNecessary.callCount).toBe(1);
+        done();
+      });
+    });
+
+
     it('should check the poll server and not process if off', () => {
       const response = {data: 'off'};
       const _axios = {get: sinon.stub().resolves(response)};
@@ -127,6 +152,7 @@ describe('#server', () => {
         expect(_stopServer.callCount).toBe(1);
       });
     });
+
   });
 
   describe( '#processResponse', () => {
