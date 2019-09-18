@@ -57,7 +57,7 @@ const getExtras = (args, name) => {
 
 module.exports.processConfig = (processedArguments) => {
   if (!processedArguments) {
-    throw 'No arguments were provided to configuration, error!';
+    throw new Error('No arguments were provided to configuration, error!');
   }
 
   config.fixedDirectory = processedArguments.d;
@@ -107,6 +107,9 @@ module.exports.processConfig = (processedArguments) => {
     if (config.poll.url) {
       config.poll.time =
       (processedArguments.t || module.exports.DEFAULT_POLLING_TIME);
+    }
+    if (processedArguments.s) {
+      config.poll.systemInformation = true;
     }
   }
 
