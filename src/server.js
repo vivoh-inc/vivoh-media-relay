@@ -1,5 +1,6 @@
 const express = require('express');
 const http = require('http');
+const si = require('systeminformation');
 const https = require('https');
 const axios = require('axios');
 const o = require('./output');
@@ -109,11 +110,16 @@ const stopServer = (module.exports.stopServer = (config) => {
   serverStatus.on = false;
 });
 
+async function getSystemInformation() {
+  return await Promise.all( [ si.cpu(), si.networkConnections() ] );
+}
+
 const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
   config,
   // These lines are only overriden inside tests
-  { _axios, _setTimeout, _processResponse, _startServer, _stopServer, _loop } = {
+  { _axios, _setTimeout, _processResponse, _startServer, _stopServer, _loop, _si } = {
     _axios: axios,
+    _si: si,
     _setTimeout: setTimeout,
     _processResponse: processResponse,
     _startServer: startServer,
@@ -121,8 +127,19 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
     _loop: true,
   }
 ) => {
-  const promise = _axios
-    .get(config.poll.url)
+
+  const requestObj = ( config.poll.systemInformation ?
+      Promise.all( [
+        _si.cpu(),
+        _si.mem(),
+        _si.currentLoad(),
+        _si.services('ffmpeg'),
+        _si.networkStats(), ] )
+      .then( ([ cpu, mem, load, ffmpeg, network ]) =>
+        _axios.post(config.poll.url, { systemInformation: { cpu, mem, load, ffmpeg, network } } ) ) :
+      _axios.get(config.poll.url) );
+
+  const promise = requestObj
     .then(response => {
       if (response.data) {
         const dynamic = _processResponse(response);

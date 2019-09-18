@@ -17,8 +17,8 @@
 		"lint": "eslint src test",
 		"build-all": "pkg package.json -t node8-linux,node8-macos,node8-win -o build/vivoh-media-relay",
 		"start-poll-server": "node dev/server.js",
-	    "start-h264-multicast": "ffmpeg -re -i video/test.mp4 -c:a aac -ar 48000 -b:a 128k -c:v h264 -profile:v main -crf 20 -g 48 -keyint_min 48 -sc_threshold 0 -b:v 2500k -maxrate 2675k -bufsize 3750k -f mpegts udp://239.0.0.1:1234",
-	    "start-h264-multicast-rtp": "ffmpeg -re -i video/test.mp4 -c:a aac -ar 48000 -b:a 128k -c:v h264 -profile:v main -crf 20 -g 48 -keyint_min 48 -sc_threshold 0 -b:v 2500k -maxrate 2675k -bufsize 3750k -f rtp_mpegts rtp://239.0.0.1:1234"
+		"start-h264-multicast": "ffmpeg -re -i video/test.mp4 -c:a aac -ar 48000 -b:a 128k -c:v h264 -profile:v main -crf 20 -g 48 -keyint_min 48 -sc_threshold 0 -b:v 2500k -maxrate 2675k -bufsize 3750k -f mpegts udp://239.0.0.1:1234",
+		"start-h264-multicast-rtp": "ffmpeg -re -i video/test.mp4 -c:a aac -ar 48000 -b:a 128k -c:v h264 -profile:v main -crf 20 -g 48 -keyint_min 48 -sc_threshold 0 -b:v 2500k -maxrate 2675k -bufsize 3750k -f rtp_mpegts rtp://239.0.0.1:1234"
 	},
 	"author": "",
 	"license": "ISC",
@@ -32,10 +32,12 @@
 		"pkg": "^4.3.7",
 		"ps-list": "^6.2.0",
 		"ps-node": "^0.1.6",
+		"systeminformation": "^4.14.8",
 		"tasklist": "^4.0.0",
 		"vivoh-media-players": "git+https://oauth:XqmPhog7ty6sxvJxzz5b@source.vivoh.org/vivoh/vivoh-media-players.git"
 	},
 	"devDependencies": {
+		"body-parser": "^1.19.0",
 		"eslint": "^5.15.3",
 		"eslint-config-google": "^0.12.0",
 		"expect": "^23.6.0",

@@ -116,6 +116,42 @@ describe('#server', () => {
       });
     });
 
+    it('should make a POST with CPU data to the poll server if configured as such', (done) => {
+      const response = {data: 'on'};
+      const _axios = {post: sinon.stub().resolves(response)};
+      const _startServer = sinon.spy();
+      const launchIfNecessary = sinon.spy();
+      const cpu = sinon.stub().resolves( { cpuCount: 2 } );
+      const mem = sinon.spy();
+      const currentLoad = sinon.spy();
+      const networkStats = sinon.spy();
+      const services = sinon.spy();
+
+      _processResponse.returns({isOn: true, mcastUrl: 'udp://239.0.0.1:1234', programId: 65432});
+      const testOverrides = {
+        _setTimeout,
+        _processResponse,
+        _axios,
+        _startServer,
+        _si: {cpu, mem, currentLoad, networkStats, services},
+        _loop: false,
+      };
+      checkPollServerForStatus(
+          {poll: {url: 'http://foobar.com/foo.json', systemInformation: true},
+            segmenter: {launchIfNecessary}},
+          testOverrides
+      ).then((_) => {
+        expect(_startServer.callCount).toBe(1);
+        expect(launchIfNecessary.callCount).toBe(1);
+        expect(cpu.callCount).toBe(1);
+        expect(_axios.post.args[0][1].systemInformation.cpu).toEqual({ cpuCount: 2});
+        expect(mem.callCount).toBe(1);
+        expect(currentLoad.callCount).toBe(1);
+        expect(networkStats.callCount).toBe(1);
+        expect(services.callCount).toBe(1);
+        done();
+      });
+    });
 
     it('should check the poll server and not process if off', () => {
       const response = {data: 'off'};
