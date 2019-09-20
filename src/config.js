@@ -108,7 +108,7 @@ module.exports.processConfig = (processedArguments) => {
       config.poll.time =
       (processedArguments.t || module.exports.DEFAULT_POLLING_TIME);
     }
-    if (processedArguments.s) {
+    if (processedArguments.systemInformation) {
       config.poll.systemInformation = true;
     }
   }

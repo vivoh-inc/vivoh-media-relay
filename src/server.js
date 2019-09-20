@@ -3,6 +3,7 @@ const http = require('http');
 const si = require('systeminformation');
 const https = require('https');
 const axios = require('axios');
+const os = require('os');
 const o = require('./output');
 const w = require('./output').write;
 const { setupRoutes } = require('./routes');
@@ -110,10 +111,6 @@ const stopServer = (module.exports.stopServer = (config) => {
   serverStatus.on = false;
 });
 
-async function getSystemInformation() {
-  return await Promise.all( [ si.cpu(), si.networkConnections() ] );
-}
-
 const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
   config,
   // These lines are only overriden inside tests
@@ -128,6 +125,7 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
   }
 ) => {
 
+  const hostname = os.hostname();
   const requestObj = ( config.poll.systemInformation ?
       Promise.all( [
         _si.cpu(),
@@ -136,7 +134,7 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
         _si.services('ffmpeg'),
         _si.networkStats(), ] )
       .then( ([ cpu, mem, load, ffmpeg, network ]) =>
-        _axios.post(config.poll.url, { systemInformation: { cpu, mem, load, ffmpeg, network } } ) ) :
+        _axios.post(config.poll.url, { systemInformation: { hostname, cpu, mem, load, ffmpeg, network } } ) ) :
       _axios.get(config.poll.url) );
 
   const promise = requestObj
