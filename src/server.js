@@ -125,16 +125,17 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
   }
 ) => {
 
-  const hostname = os.hostname();
+  const hostname = process.env.VMR_HOSTNAME || os.hostname();
   const requestObj = ( config.poll.systemInformation ?
       Promise.all( [
         _si.cpu(),
         _si.mem(),
         _si.currentLoad(),
         _si.services('ffmpeg'),
+        _si.networkInterfaces(),
         _si.networkStats(), ] )
-      .then( ([ cpu, mem, load, ffmpeg, network ]) =>
-        _axios.post(config.poll.url, { systemInformation: { hostname, cpu, mem, load, ffmpeg, network } } ) ) :
+      .then( ([ cpu, mem, load, ffmpeg, interfaces, network ]) =>
+        _axios.post(config.poll.url, { systemInformation: { hostname, cpu, mem, load, ffmpeg, interfaces, network } } ) ) :
       _axios.get(config.poll.url) );
 
   const promise = requestObj

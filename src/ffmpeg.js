@@ -31,6 +31,7 @@ module.exports.killProcesses = _ => {
   const killed = [];
   _pids.forEach(pid => {
     if (pid) {
+      console.log('Killing ffmpeg pid: ', pid);
       ps.kill(pid, err => {
         if (err) {
           console.log('Error killing ffmpeg process');
