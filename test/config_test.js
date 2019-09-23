@@ -85,7 +85,7 @@ describe('#config', () => {
     });
 
     it('should support making a post', () => {
-      const args = {u: 'http://polling.com/foo.json', s: true };
+      const args = {u: 'http://polling.com/foo.json', systemInformation: true};
       const config = processConfig(args);
       expect(config.poll.systemInformation).toBe(true);
     });
