@@ -187,6 +187,7 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
 const convertCarefullyMergedToDynamic = (merged) => {
   const dynamic = {};
   dynamic.address = merged.mcastUrl;
+  dynamic.programId = merged.programId;
   return dynamic;
 }
 

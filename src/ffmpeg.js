@@ -56,7 +56,7 @@ module.exports.launchIfNecessary = function(config, dynamic) {
 
     const { fixedDirectory, extras } = config;
 
-    const { address } = dynamic;
+    const { address, programId } = dynamic;
 
     if (!fixedDirectory) {
       reject(new Error('Invalid directory, internal error: ' + fixedDirectory));
@@ -69,7 +69,8 @@ module.exports.launchIfNecessary = function(config, dynamic) {
             launchFfmpeg({
               extras,
               address,
-              fixedDirectory
+              fixedDirectory,
+              programId,
             })
           ) {
             resolve(true);
@@ -108,6 +109,7 @@ const getFfmpegBinary = () => {
 
 const getArgumentsForFfmpeg = (module.exports.getArgumentsForFfmpeg = ({
   address,
+  programId,
   fixedDirectory = _config.DEFAULT_FIXED_DIRECTORY,
   extras
 } = {}) => {
@@ -127,7 +129,12 @@ const getArgumentsForFfmpeg = (module.exports.getArgumentsForFfmpeg = ({
     logFile = extras.log;
   }
 
-  args.push(path.join(fixedDirectory, 'redirect.m3u8'));
+  const fullPath = [ fixedDirectory ];
+  if (programId) {
+    fullPath.push( programId );
+  }
+  fullPath.push( 'redirect.m3u8' );
+  args.push(path.join(...fullPath));
   return { args, exe };
 });
 

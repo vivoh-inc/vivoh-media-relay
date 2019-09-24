@@ -44,6 +44,24 @@ describe('#ffmpeg', () => {
         ],
       });
     });
+
+    it('should work with a PID', () => {
+      const exeAndArgs = ffmpeg.getArgumentsForFfmpeg({
+        extras: {extras: '-foobar -barfoo'},
+        address,
+        programId: '12345',
+      });
+      expect(exeAndArgs).toEqual({
+        exe: 'ffmpeg',
+        args: [
+          '-i',
+          'rtp://239.0.0.1:1234',
+          '-foobar',
+          '-barfoo',
+          'vivoh_media_relay/12345/redirect.m3u8',
+        ],
+      });
+    });
   });
 
   describe('#checkForFfmpeg', () => {
