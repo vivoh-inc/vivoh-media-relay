@@ -126,6 +126,7 @@ describe('#server', () => {
       const currentLoad = sinon.spy();
       const networkStats = sinon.spy();
       const services = sinon.spy();
+      const networkInterfaces = sinon.spy();
 
       _processResponse.returns({isOn: true, mcastUrl: 'udp://239.0.0.1:1234', programId: 65432});
       const testOverrides = {
@@ -133,7 +134,7 @@ describe('#server', () => {
         _processResponse,
         _axios,
         _startServer,
-        _si: {cpu, mem, currentLoad, networkStats, services},
+        _si: {cpu, mem, currentLoad, networkStats, services, networkInterfaces},
         _loop: false,
       };
       checkPollServerForStatus(
@@ -149,6 +150,7 @@ describe('#server', () => {
         expect(currentLoad.callCount).toBe(1);
         expect(networkStats.callCount).toBe(1);
         expect(services.callCount).toBe(1);
+        expect(networkInterfaces.callCount).toBe(1);
         done();
       });
     });
