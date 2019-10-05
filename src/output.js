@@ -34,4 +34,5 @@ module.exports.server = (server) => {
   _renderer.server(server);
 };
 
-module.exports.segmenter = (_segmenter) => _renderer.segmenter(_segmenter);
+// module.exports.segmenter = (_segmenter) => _renderer.segmenter(_segmenter);
+module.exports.updateSegmenter = ( name, details ) => _renderer.updateSegmenter( name, details );

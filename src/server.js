@@ -90,6 +90,7 @@ const processResponse = (module.exports.processReponse = response => {
       port = response.data.port;
       flags = response.data.flags;
       credentials = response.data.credentials;
+      programs = response.data.programs
       programId = response.data.programId;
       mcastUrl = response.data.mcastUrl;
       startDateTime = response.data.startDateTime;
@@ -100,7 +101,7 @@ const processResponse = (module.exports.processReponse = response => {
     isOn = true;
   }
 
-  return { isOn, redirect, url, port, flags, credentials,  programId, mcastUrl, startDateTime, endDateTime, pollInterval  };
+  return { isOn, redirect, url, port, flags, credentials,  programId, programs, mcastUrl, startDateTime, endDateTime, pollInterval  };
 });
 
 const stopServer = (module.exports.stopServer = (config) => {

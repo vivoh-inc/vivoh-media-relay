@@ -13,7 +13,7 @@ describe('#ffmpeg', () => {
     });
 
     it('should work with just the address', () => {
-      const exeAndArgs = ffmpeg.getArgumentsForFfmpeg({address});
+      const exeAndArgs = ffmpeg.getArgumentsForFfmpeg({ address });
       expect(exeAndArgs).toEqual({
         exe: 'ffmpeg',
         args: [
@@ -30,7 +30,7 @@ describe('#ffmpeg', () => {
 
     it('should permit extras', () => {
       const exeAndArgs = ffmpeg.getArgumentsForFfmpeg({
-        extras: {extras: '-foobar -barfoo'},
+        extras: { extras: '-foobar -barfoo' },
         address,
       });
       expect(exeAndArgs).toEqual({
@@ -47,7 +47,7 @@ describe('#ffmpeg', () => {
 
     it('should work with a PID', () => {
       const exeAndArgs = ffmpeg.getArgumentsForFfmpeg({
-        extras: {extras: '-foobar -barfoo'},
+        extras: { extras: '-foobar -barfoo' },
         address,
         programId: '12345',
       });
@@ -62,23 +62,24 @@ describe('#ffmpeg', () => {
         ],
       });
     });
+
   });
 
   describe('#checkForFfmpeg', () => {
-    it('should see if things work with faked make', (done) => {
-      ffmpeg.checkForBinary({extras: {bin: 'make'}}).then((_) => {
+    it('should see if things work with faked make', done => {
+      ffmpeg.checkForBinary({ extras: { bin: 'make' } }).then(_ => {
         expect(true).toBeTruthy();
         done();
       });
     });
 
-    it('should fail if binary is not real', (done) => {
+    it('should fail if binary is not real', done => {
       ffmpeg
-          .checkForBinary({extras: {bin: '123123098091309138'}})
-          .catch((_) => {
-            expect(true).toBeTruthy();
-            done();
-          });
+        .checkForBinary({ extras: { bin: '123123098091309138' } })
+        .catch(_ => {
+          expect(true).toBeTruthy();
+          done();
+        });
     });
   });
 });

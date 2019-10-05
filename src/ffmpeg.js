@@ -57,28 +57,37 @@ module.exports.launchIfNecessary = function(config, dynamic) {
 
     const { fixedDirectory, extras } = config;
 
-    const { address, programId } = dynamic;
+    const { address, programId, programs } = dynamic;
 
     if (!fixedDirectory) {
       reject(new Error('Invalid directory, internal error: ' + fixedDirectory));
     } else {
-      isFfmpegRunning(address).then(running => {
-        if (running) {
-          resolve(true);
-        } else {
-          if (
-            launchFfmpeg({
-              extras,
-              address,
-              fixedDirectory,
-              programId,
-            })
-          ) {
+
+      if (!programs) {
+        programs = [];
+        programs.push({ programId, address });
+      }
+
+      programs.forEach( program => {
+        isFfmpegRunning(p.address).then(running => {
+          if (running) {
+            o.segmenter( { running: { name: p.address, status: 'on'} });
             resolve(true);
           } else {
-            reject(new Error('Error launching ffmpeg'));
+            o.segmenter( { running: { name: p.address, status: 'starting'} });
+            if (
+              launchFfmpeg({
+                extras,
+                address: program.address,
+                fixedDirectory,
+                programId: program.programId,
+              })) {
+              resolve(true);
+            } else {
+              reject(new Error(`Error launching ffmpeg for ${program.programId}`));
+            }
           }
-        }
+        });
       });
     }
   });

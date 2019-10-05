@@ -4,12 +4,17 @@ const React = require('react');
 const PropTypes = require('prop-types');
 const { Text, Color, Box } = require('ink');
 
-const Segmenter = ({segmenter}) => {
-  const { status } = segmenter;
-
+const Segmenter = ({segmenters}) => {
   return (
     <Box height={3}>
-      <Text>Segmenter status: {status || 'off'}</Text>
+      { Object.keys( segmenters ).map( s => {
+        return (
+          <>
+          <Text>Segmenter address: {s.address }</Text>
+          <Text>Segmenter status: {s.status || 'off'}</Text>
+          </>
+          );
+      })};
     </Box>
     );
 };

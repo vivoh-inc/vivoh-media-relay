@@ -19,7 +19,7 @@ const App = ({ startFn }) => {
   const [server, _setServer] = useState({});
 	const [errors, _setErrors] = useState([]);
 	const [programs, _addProgram] = useState([]);
-	const [segmenter, _setSegmenter] = useState({});
+	const [segmenters, _setSegmenter] = useState({});
 	const [delay, setDelay] = useState(1*1000);
 	const [tick, setTick] = useState(1);
 	const [messages, setMessages] = useState([]);
@@ -32,6 +32,13 @@ const App = ({ startFn }) => {
 			return [error, ..._errs]
 		});
 	};
+
+	const updateSegmenter = (name, details) => {
+		_setSegmenter( original => {
+			original[name] = details;
+			_setSegmenter( original );
+		});
+	}
 
 	const addProgram = (program) => {
 		_addProgram( programs => [program,...programs] );
@@ -88,7 +95,7 @@ const App = ({ startFn }) => {
 			poll: setPoll,
 			message: addMessage,
 			programs: addProgram,
-			segmenter: setSegmenter,
+			updateSegmenter,
 			stop: () => setDelay(0),
     });
   }, []);
@@ -114,7 +121,7 @@ const App = ({ startFn }) => {
 
 			<Programs programs={programs}/>
 
-			<Segmenter segmenter={segmenter}/>
+			<Segmenter segmenters={segmenters}/>
 
 			<Messages messages={messages}/>
 			<Errors messages={errors}/>

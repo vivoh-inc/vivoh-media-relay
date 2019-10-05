@@ -197,11 +197,20 @@ describe('#server', () => {
       expect(response.isOn).toBe(true);
     });
 
-    it( 'should contain extra information if response', () => {
+    it( 'should contain extra information in response', () => {
       const response = processReponse( {data: {on: true, programId: '12345', mcastUrl: 'udp://239.0.0.1:1234'}} );
       expect(response.isOn).toBe(true);
       expect(response.mcastUrl).toBe('udp://239.0.0.1:1234');
       expect(response.programId).toBe('12345');
     });
+
+    it( 'should process multiple programs', () => {
+      const response = processReponse( {data: {on: true, programs: [{ programId: '12345', mcastUrl: 'udp://239.0.0.1:1234' }] }} );
+      expect(response.isOn).toBe(true);
+      expect(response.programs[0].mcastUrl).toBe('udp://239.0.0.1:1234');
+      expect(response.programs[0].programId).toBe('12345');
+    });
+
+
   });
 });
