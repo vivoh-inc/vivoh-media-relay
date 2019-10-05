@@ -1,21 +1,42 @@
 /* eslint-disable max-len */
 const colors = require('colors'); // eslint-disable-line no-unused-vars
+
+// Setup default no-ops.
+let _renderer = {poll: () => {}, server: () => {}};
+module.exports.setRenderer = (renderer) => _renderer = renderer;
+
 const ready = module.exports.ready = () => '.'.green.bold;
 const startFfmpeg = module.exports.startFfmpeg = () => '*'.red.bold;
 const startTSDuck = module.exports.startTSDuck = () => '*'.red.bold;
 const startServer = module.exports.startServer = () => '🛫'.red.bold;
 const stopServer = module.exports.stopServer = () => '🛬'.blue.bold;
 const holding = module.exports.holding = () => '@'.yellow.bold;
-const pollServerFailure = module.exports.pollServerFailure = () => '↯'.red.bold;
-const pollServerOn = module.exports.pollServerOn = () => '📻'.green.bold;
-const pollServerOff = module.exports.pollServerOff = () => '🚫'.red.bold;
+const pollServerFailure = module.exports.pollServerFailure = () => _renderer.poll({error: true});
+const pollServerOn = module.exports.pollServerOn = () => {
+  // '📻'.green.bold;
+  _renderer.poll( {on: false});
+};
+const pollServerOff = module.exports.pollServerOff = () => _renderer.poll({on: false});//  '🚫'.red.bold;
 const {version} = require( './version');
 
 module.exports.write = (t) => {
-  process.stdout.write(t);
+  // process.stdout.write(t);
 };
 
-module.exports.banner = () => console.log(`\n\n${'Vivoh Media Relay'.rainbow} ${version.red}`);
+module.exports.errors = (err) => {
+  _renderer && _renderer.errors(err);
+};
+
+module.exports.poll = (poll) => {
+  // console.log( "Got poll information: ", poll, _renderer.poll );
+  _renderer.poll(poll);
+};
+
+module.exports.banner = () => {
+  _renderer.banner(`\n\n${'Vivoh Media Relay'.rainbow} ${version.red}`);
+};
+
+module.exports.server = (server) => _renderer.server(server);
 
 module.exports.legend = () => {
   let rv = `

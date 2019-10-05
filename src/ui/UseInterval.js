@@ -1,5 +1,5 @@
 const React = require('react');
-const { useEffect, useRef } = require( 'react');
+const { useEffect, useRef } = require('react');
 
 function useInterval(callback, delay) {
   const savedCallback = useRef();

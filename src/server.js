@@ -19,7 +19,7 @@ module.exports.run = (
   }
 ) => {
   if (config.poll && config.poll.url) {
-    o.write('POLL'.bold + ' (timeout ' + config.poll.time + ' secs)\n');
+    o.poll( config.poll ); // ('POLL'.bold + ' (timeout ' + config.poll.time + ' secs)\n');
   }
 
   if (config.poll && config.poll.url) {
@@ -32,11 +32,13 @@ module.exports.run = (
 const startServer = (module.exports.startServer = config => {
   if (!app) {
     if (server) {
-      console.log('Closing existing server');
+      o.server({on: false});
+      // console.log('Closing existing server');
       server.close();
     }
 
-    w(o.startServer());
+    o.server({ on: true});
+    // w(o.startServer());
     app = express();
     setupRoutes({ app, type: 'hls', config });
     app.use(
@@ -58,7 +60,8 @@ const startServer = (module.exports.startServer = config => {
         .listen(config.port, config.ipAddress)
         .on('error', notifyListenError);
     } else {
-      o.write(`\n\nStarting server: ${config.ipAddress}:${config.port}\n\n`);
+      o.server({on:true, config});
+      // write(`\n\nStarting server: ${config.ipAddress}:${config.port}\n\n`);
       server = http
         .createServer(app)
         .listen(config.port, config.ipAddress)
@@ -103,7 +106,7 @@ const stopServer = (module.exports.stopServer = (config) => {
     w(o.stopServer());
     app = undefined;
     server = undefined;
-    console.log('\n\nServer stopped.\n\n');
+    o.server({on:false});
     config.segmenter.killProcesses();
   }
   serverStatus.on = false;
@@ -127,9 +130,11 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
       if (response.data) {
         const dynamic = _processResponse(response);
         if (dynamic) {
+          o.poll( { response: dynamic });
           isOn = dynamic.isOn;
           if (isOn) {
-            w(o.pollServerOn());
+            o.poll({on: true});
+            // w(o.pollServerOn());
             const carefullyMerged = { ...config };
             Object.keys(dynamic).forEach(k => {
               if (dynamic[k]) {
@@ -143,8 +148,9 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
               config.segmenter.launchIfNecessary(config, dynamic);
             }
           } else {
-            w(o.pollServerOff());
-            config.segmenter.killFfmpegProcesses();
+            o.poll({on: false});
+            // w(o.pollServerOff());
+            config.segmenter.killProcesses();
             _stopServer(config);
           }
         } else {
@@ -156,7 +162,7 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
     })
     .catch(error => {
       // console.log( "Got an error: ", error );
-      w(o.pollServerFailure(error));
+      w(o.poll({error}));
       _stopServer(config);
     });
 
