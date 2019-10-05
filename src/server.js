@@ -48,8 +48,14 @@ const startServer = (module.exports.startServer = config => {
     );
 
     app.get('/:path/:tsFile', function(req, res) {
-      path = req.params.tsFile;
+      const path = req.params.tsFile;
       res.sendFile(path, { root: config.fixedDirectory });
+    });
+
+    app.get('/:path/:programId/:tsFile', function(req, res) {
+      const path = req.params.tsFile;
+      const programId = req.params.programId;
+      res.sendFile(path, { root: path.join(config.fixedDirectory, programId) });
     });
 
     if (config.credentials) {
@@ -184,6 +190,7 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
 const convertCarefullyMergedToDynamic = (merged) => {
   const dynamic = {};
   dynamic.address = merged.mcastUrl;
+  dynamic.programId = merged.programId;
   return dynamic;
 }
 

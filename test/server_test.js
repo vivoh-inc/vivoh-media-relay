@@ -194,13 +194,14 @@ describe('#server', () => {
   describe( '#processResponse', () => {
     it( 'should be on if response is on', () => {
       const response = processReponse( {data: {on: true}} );
-      expect( response.isOn).toBe(true);
+      expect(response.isOn).toBe(true);
     });
 
-    it( 'should be contain extra information if response', () => {
-      const response = processReponse( {data: {on: true, mcastUrl: 'udp://239.0.0.1:1234'}} );
-      expect( response.isOn).toBe(true);
-      expect( response.mcastUrl).toBe('udp://239.0.0.1:1234');
+    it( 'should contain extra information if response', () => {
+      const response = processReponse( {data: {on: true, programId: '12345', mcastUrl: 'udp://239.0.0.1:1234'}} );
+      expect(response.isOn).toBe(true);
+      expect(response.mcastUrl).toBe('udp://239.0.0.1:1234');
+      expect(response.programId).toBe('12345');
     });
   });
 });
