@@ -3,7 +3,6 @@ const fs = require('fs');
 const dirUtils = require('./dir_utils');
 const mime = require('./mime');
 const o = require('./output');
-const w = require( './output').write;
 const {serverStatus} = require('./server_status');
 const RETRY_MAX = 60;
 
@@ -25,7 +24,7 @@ const ifTsFilesAreReadyThenSend =
           .isReadyToView(config.fixedDirectory)
           .then( (ready) => {
             if (ready && serverStatus.on) {
-              w(o.ready());
+              o.segmenter({status: 'ready'});
               sendRedirectFile(config.fixedDirectory, res);
             } else {
               if (serverStatus.on && index < RETRY_MAX) {
@@ -34,14 +33,14 @@ const ifTsFilesAreReadyThenSend =
                       {config, address, res,
                         index: index + 1});
                 }, 1000);
-                w(o.holding());
+                o.segmenter({status: 'holding'});
               } else {
                 res.send('Error, timed out.');
               }
             }
           })
           .catch((err) => {
-            console.log('Error: ', err);
+            o.errors('Error: ' + err.toString());
             throw err;
           });
     };

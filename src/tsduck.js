@@ -169,7 +169,7 @@ const launchTSDuck = (module.exports.launchTSDuck = config => {
 
     pids[address] = tsduck.pid;
 
-    w(o.startTSDuck());
+    o.segmenter({status:'starting'});
 
     return true;
   }

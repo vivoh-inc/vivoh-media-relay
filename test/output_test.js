@@ -1,0 +1,43 @@
+const React = require('react');
+const {render} = require('ink-testing-library');
+const importJsx = require('import-jsx');
+const expect = require('expect');
+const Server = importJsx('../src/ui/Server.jsx');
+const Programs = importJsx('../src/ui/Programs.jsx');
+const stripAnsi = require('strip-ansi');
+
+describe('#ui', () => {
+  describe('#Server', () => {
+    it('should display off when nothing is provided', () => {
+      const {lastFrame} = render(React.createElement(Server, { server: {} }));
+      const rendered = stripAnsi(lastFrame());
+      expect(rendered).toEqual('Server status: off\n\n');
+    });
+    it('should display on when server is on', () => {
+      const config = { url: 'udp://239.0.0.1:1234', port: 4567};
+      const {lastFrame} = render(React.createElement(Server, {server: { on: true, config }}));
+      const rendered = stripAnsi(lastFrame());
+      const msg = `Server status: listening on 4567
+HLS: http://localhost:4567/hls.html?s=udp://239.0.0.1:1234
+`;
+      expect(rendered).toEqual(msg);
+    });
+  });
+
+  describe('#Programs', () => {
+    it('should display nothing when no programs are active', () => {
+      const {lastFrame} = render(React.createElement(Programs));
+      const rendered = stripAnsi(lastFrame());
+      expect(rendered).toEqual('');
+    });
+    it('should display programs when active', () => {
+      const programs = [
+        {name: 'XYZ', id: '12314123'},
+        {name: 'ABC', id: 123123213},
+      ];
+      const {lastFrame} = render(React.createElement(Programs, {programs}));
+      const rendered = stripAnsi(lastFrame());
+      expect(rendered).toEqual('XYZ [12314123] \nABC [123123213] ');
+    });
+  });
+});

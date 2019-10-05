@@ -1,3 +1,5 @@
+const o = require('./output');
+
 // timebomb it
 const isExpired = () => {
   const now = new Date();
@@ -6,7 +8,7 @@ const isExpired = () => {
 
 module.exports.timebomb = function() {
   if ( isExpired() ) {
-    console.log( 'This server binary has expired. Please check https://vivoh.com/products/vmr for an update' );
+    o.message('This server binary has expired. Please check https://vivoh.com/products/vmr for an update');
     process.exit( -1 );
   }
 };

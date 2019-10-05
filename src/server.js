@@ -5,7 +5,6 @@ const https = require('https');
 const axios = require('axios');
 const os = require('os');
 const o = require('./output');
-const w = require('./output').write;
 const { setupRoutes } = require('./routes');
 const { DEFAULT_POLLING_TIME } = require('./config');
 const { serverStatus } = require('./server_status');
@@ -21,7 +20,7 @@ module.exports.run = (
   }
 ) => {
   if (config.poll && config.poll.url) {
-    o.write('POLL'.bold + ' (timeout ' + config.poll.time + ' secs)\n');
+    o.poll( config.poll ); // ('POLL'.bold + ' (timeout ' + config.poll.time + ' secs)\n');
   }
 
   if (config.poll && config.poll.url) {
@@ -34,11 +33,10 @@ module.exports.run = (
 const startServer = (module.exports.startServer = config => {
   if (!app) {
     if (server) {
-      console.log('Closing existing server');
+      // o.server({on: false});
+      // console.log('Closing existing server');
       server.close();
     }
-
-    w(o.startServer());
     app = express();
     setupRoutes({ app, type: 'hls', config });
     app.use(
@@ -57,22 +55,22 @@ const startServer = (module.exports.startServer = config => {
     if (config.credentials) {
       server = https
         .createServer(config.credentials, app)
-        .listen(config.port, config.ipAddress)
+        .listen(config.port, config.ipAddress, () => o.server( { on: true, config } ))
         .on('error', notifyListenError);
     } else {
-      o.write(`\n\nStarting server: ${config.ipAddress}:${config.port}\n\n`);
       server = http
         .createServer(app)
-        .listen(config.port, config.ipAddress)
-        .on('error', notifyListenError); // , () => { console.log( "We are on!")});
+        .listen(config.port, config.ipAddress, () => o.server( { on: true, config } ) )
+        .on('error', notifyListenError);
     }
 
+    o.server( { on: true, config });
     serverStatus.on = true;
   }
 });
 
 const notifyListenError = () => {
-  console.log('An error occurred, is the server already running?');
+  o.errors('An error occurred, is the server already running?');
 };
 
 const processResponse = (module.exports.processReponse = response => {
@@ -102,10 +100,9 @@ const processResponse = (module.exports.processReponse = response => {
 const stopServer = (module.exports.stopServer = (config) => {
   if (app && server) {
     server.close();
-    w(o.stopServer());
     app = undefined;
     server = undefined;
-    console.log('\n\nServer stopped.\n\n');
+    o.server({on:false});
     config.segmenter.killProcesses();
   }
   serverStatus.on = false;
@@ -143,9 +140,11 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
       if (response.data) {
         const dynamic = _processResponse(response);
         if (dynamic) {
+          o.poll( { response: dynamic });
+          o.message('Poll server request successful');
           isOn = dynamic.isOn;
           if (isOn) {
-            w(o.pollServerOn());
+            o.poll({on: true});
             const carefullyMerged = { ...config };
             Object.keys(dynamic).forEach(k => {
               if (dynamic[k]) {
@@ -159,20 +158,18 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
               config.segmenter.launchIfNecessary(config, dynamic);
             }
           } else {
-            w(o.pollServerOff());
-            config.segmenter.killFfmpegProcesses();
+            o.poll({on: false});
+            config.segmenter.killProcesses();
             _stopServer(config);
           }
         } else {
-          w(o.pollServerOff());
           _stopServer(config);
           config.segmenter.killFfmpegProcesses();
         }
       }
     })
     .catch(error => {
-      // console.log( "Got an error: ", error );
-      w(o.pollServerFailure(error));
+      o.poll({error});
       _stopServer(config);
     });
 

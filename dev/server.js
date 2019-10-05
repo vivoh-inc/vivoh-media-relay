@@ -18,7 +18,10 @@ const respond = (res) => {
 const port = 9090;
 let on = false;
 app.get('/', (req, res) => {
-  respond(res);
+
+  console.log( `${(new Date()).toString()}: /`);
+  useJson ? res.json({on})
+    : res.send(on ? 'on' : 'off');
 });
 
 app.post('/', (req, res) => {
@@ -28,6 +31,7 @@ app.post('/', (req, res) => {
 
 
 app.get('/ffmpeg', (_, res) => {
+  console.log( `${(new Date()).toString()}: /ffmpeg`, );
   const response = { on, mcastUrl: 'rtp://239.0.0.1:1234', programId: '12345'};
   res.json(response);
 });
