@@ -9,14 +9,18 @@ const stripAnsi = require('strip-ansi');
 describe('#ui', () => {
   describe('#Server', () => {
     it('should display off when nothing is provided', () => {
-      const {lastFrame} = render(React.createElement(Server));
+      const {lastFrame} = render(React.createElement(Server, { server: {} }));
       const rendered = stripAnsi(lastFrame());
-      expect(rendered).toEqual('Status: off');
+      expect(rendered).toEqual('Server status: off\n\n');
     });
     it('should display on when server is on', () => {
-      const {lastFrame} = render(React.createElement(Server, {on: true}));
+      const config = { url: 'udp://239.0.0.1:1234', port: 4567};
+      const {lastFrame} = render(React.createElement(Server, {server: { on: true, config }}));
       const rendered = stripAnsi(lastFrame());
-      expect(rendered).toEqual('Status: on');
+      const msg = `Server status: listening on 4567
+HLS: http://localhost:4567/hls.html?s=udp://239.0.0.1:1234
+`;
+      expect(rendered).toEqual(msg);
     });
   });
 
