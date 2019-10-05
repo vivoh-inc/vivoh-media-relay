@@ -38,10 +38,12 @@
 		"ps-list": "^6.2.0",
 		"ps-node": "^0.1.6",
 		"react": "^16.10.1",
+		"systeminformation": "^4.14.8",
 		"tasklist": "^4.0.0",
 		"vivoh-media-players": "git+https://oauth:XqmPhog7ty6sxvJxzz5b@source.vivoh.org/vivoh/vivoh-media-players.git"
 	},
 	"devDependencies": {
+		"body-parser": "^1.19.0",
 		"eslint": "^5.15.3",
 		"eslint-config-google": "^0.12.0",
 		"expect": "^23.6.0",

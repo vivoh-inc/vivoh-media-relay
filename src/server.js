@@ -1,7 +1,9 @@
 const express = require('express');
 const http = require('http');
+const si = require('systeminformation');
 const https = require('https');
 const axios = require('axios');
+const os = require('os');
 const o = require('./output');
 const { setupRoutes } = require('./routes');
 const { DEFAULT_POLLING_TIME } = require('./config');
@@ -109,8 +111,9 @@ const stopServer = (module.exports.stopServer = (config) => {
 const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
   config,
   // These lines are only overriden inside tests
-  { _axios, _setTimeout, _processResponse, _startServer, _stopServer, _loop } = {
+  { _axios, _setTimeout, _processResponse, _startServer, _stopServer, _loop, _si } = {
     _axios: axios,
+    _si: si,
     _setTimeout: setTimeout,
     _processResponse: processResponse,
     _startServer: startServer,
@@ -118,8 +121,21 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
     _loop: true,
   }
 ) => {
-  const promise = _axios
-    .get(config.poll.url)
+
+  const hostname = process.env.VMR_HOSTNAME || os.hostname();
+  const requestObj = ( config.poll.systemInformation ?
+      Promise.all( [
+        _si.cpu(),
+        _si.mem(),
+        _si.currentLoad(),
+        _si.services('ffmpeg'),
+        _si.networkInterfaces(),
+        _si.networkStats(), ] )
+      .then( ([ cpu, mem, load, ffmpeg, interfaces, network ]) =>
+        _axios.post(config.poll.url, { systemInformation: { hostname, cpu, mem, load, ffmpeg, interfaces, network } } ) ) :
+      _axios.get(config.poll.url) );
+
+  const promise = requestObj
     .then(response => {
       if (response.data) {
         const dynamic = _processResponse(response);

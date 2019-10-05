@@ -1,5 +1,7 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
+app.use(bodyParser.json());
 
 const argv = require('minimist')(process.argv.slice(2));
 
@@ -8,13 +10,25 @@ if (argv.txt) {
   useJson = false;
 }
 
+const respond = (res) => {
+  useJson ? res.json({on})
+  : res.send(on ? 'on' : 'off');
+}
+
 const port = 9090;
 let on = false;
 app.get('/', (req, res) => {
+
   console.log( `${(new Date()).toString()}: /`);
   useJson ? res.json({on})
     : res.send(on ? 'on' : 'off');
 });
+
+app.post('/', (req, res) => {
+  console.log( 'Body is: ', JSON.stringify(req.body, undefined, 2));
+  respond(res);
+});
+
 
 app.get('/ffmpeg', (_, res) => {
   console.log( `${(new Date()).toString()}: /ffmpeg`, );

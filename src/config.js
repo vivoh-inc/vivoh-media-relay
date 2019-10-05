@@ -6,7 +6,7 @@ const tsduckSegmenter = require('./tsduck');
 const o = require('./output');
 
 module.exports.DEFAULT_FIXED_DIRECTORY = './vivoh_media_relay';
-module.exports.DEFAULT_POLLING_TIME = 60;
+const DEFAULT_POLLING_TIME = module.exports.DEFAULT_POLLING_TIME = 60;
 
 module.exports.updateConfig = (key, value) => {
   config[key] = value;
@@ -58,7 +58,7 @@ const getExtras = (args, name) => {
 
 module.exports.processConfig = (processedArguments) => {
   if (!processedArguments) {
-    throw 'No arguments were provided to configuration, error!';
+    throw new Error('No arguments were provided to configuration, error!');
   }
 
   config.fixedDirectory = processedArguments.d;
@@ -110,8 +110,13 @@ module.exports.processConfig = (processedArguments) => {
   if (processedArguments.u) {
     config.poll = {url: processedArguments.u};
     if (config.poll.url) {
-      config.poll.time =
-      (processedArguments.t || module.exports.DEFAULT_POLLING_TIME);
+      config.poll.time = DEFAULT_POLLING_TIME;
+      if (typeof processedArguments.t === 'number') { // disallow multiple arguments, bad!
+        config.poll.time = processedArguments.t;
+      }
+    }
+    if (processedArguments.systemInformation) {
+      config.poll.systemInformation = true;
     }
   }
 

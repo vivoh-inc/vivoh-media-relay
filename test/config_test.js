@@ -69,17 +69,25 @@ describe('#config', () => {
     expect(config.segmenter.name).toBe('ffmpeg');
   });
 
-  it('should support polling args', () => {
-    const args = {t: 345, u: 'http://polling.com/foo.json'};
-    const config = processConfig(args);
-    // Convert to seconds
-    expect(config.poll.time).toBe(345);
-    expect(config.poll.url).toBe('http://polling.com/foo.json');
-  });
+  describe( '#poll', () => {
+    it('should support polling args', () => {
+      const args = {t: 345, u: 'http://polling.com/foo.json'};
+      const config = processConfig(args);
+      // Convert to seconds
+      expect(config.poll.time).toBe(345);
+      expect(config.poll.url).toBe('http://polling.com/foo.json');
+    });
 
-  it('should have def polling time if polling server is on', () => {
-    const args = {u: 'http://polling.com/foo.json'};
-    const config = processConfig(args);
-    expect(config.poll.time).toBe(DEFAULT_POLLING_TIME);
+    it('should have def polling time if polling server is on', () => {
+      const args = {u: 'http://polling.com/foo.json'};
+      const config = processConfig(args);
+      expect(config.poll.time).toBe(DEFAULT_POLLING_TIME);
+    });
+
+    it('should support making a post', () => {
+      const args = {u: 'http://polling.com/foo.json', systemInformation: true};
+      const config = processConfig(args);
+      expect(config.poll.systemInformation).toBe(true);
+    });
   });
 });
