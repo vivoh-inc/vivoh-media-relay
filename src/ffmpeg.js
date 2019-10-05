@@ -45,6 +45,8 @@ module.exports.killProcesses = _ => {
   killed.forEach( k => {
     delete pids[k];
   });
+
+  o.segmenter({status: 'off'});
 };
 
 module.exports.launchIfNecessary = function(config, dynamic) {
