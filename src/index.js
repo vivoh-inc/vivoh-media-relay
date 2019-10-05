@@ -10,10 +10,9 @@ process.env.PATH = `${process.env.PATH}:.`;
 
 const app = require('./ui/cli').app;
 
-const config = processConfig(processedArguments);
-
 const startFn = (renderer) => {
   o.setRenderer(renderer);
+  const config = processConfig(processedArguments);
   config.segmenter
       .checkForBinary(config)
       .then((_) => {
@@ -26,7 +25,7 @@ const startFn = (renderer) => {
         }
       })
       .catch((_) => {
-        console.log('An error occurred running the segmenter', _);
+        o.errors('An error occurred running the segmenter' + _);
       });
 };
 

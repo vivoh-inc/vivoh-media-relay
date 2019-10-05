@@ -3,6 +3,7 @@ const path = require('path');
 const config = {};
 const ffmpegSegmenter = require('./ffmpeg');
 const tsduckSegmenter = require('./tsduck');
+const o = require('./output');
 
 module.exports.DEFAULT_FIXED_DIRECTORY = './vivoh_media_relay';
 module.exports.DEFAULT_POLLING_TIME = 60;
@@ -30,7 +31,7 @@ const getCredentials = (encrypted) => {
       keyPath = a;
       certificatePath = b;
       const chain = c;
-      console.log('Using custom cert paths: ', keyPath, certificatePath, chain);
+      // console.log('Using custom cert paths: ', keyPath, certificatePath, chain);
       credentials.key = fs.readFileSync(keyPath, 'utf8');
       credentials.cert = fs.readFileSync(certificatePath, 'utf8');
       credentials.ca = fs.readFileSync(chain, 'utf8');
@@ -76,11 +77,15 @@ module.exports.processConfig = (processedArguments) => {
     if (!fs.existsSync(config.fixedDirectory)) {
       fs.mkdirSync(config.fixedDirectory);
     } else {
+      const files = [];
       fs.readdirSync(config.fixedDirectory).forEach((f) => {
         const fileToDelete = path.join(config.fixedDirectory, f);
-        console.log('about to delete: ', fileToDelete);
+        files.push(fileToDelete);
         fs.unlinkSync(fileToDelete);
       });
+      if (files.length > 0) {
+        o.message(`Deleting files: ${files.join(', ')}`);
+      }
     }
   } else {
     // Fix it up.

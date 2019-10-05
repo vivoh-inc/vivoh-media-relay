@@ -6,6 +6,7 @@ const vivohMediaPlayers = require('vivoh-media-players');
 const ip = require('ip');
 const {isRunning} = require('./ffmpeg');
 const {getProgram} = require('./programs');
+const o = require('./output');
 
 let currentAddress;
 
@@ -64,7 +65,7 @@ module.exports.setupRoutes = ({type = 'hls', app, config}) => {
     let address = (currentAddress = getAddress(req.originalUrl));
     if (req.params.pid) {
       address = getProgram(req.query.pid);
-      console.log( 'Address is:', address );
+      o.message( 'Address is:', address );
     }
 
     sendBackPlaylistWhenReady({config, address, res});
@@ -74,7 +75,7 @@ module.exports.setupRoutes = ({type = 'hls', app, config}) => {
     let address = (currentAddress = convertPathToAddress(req.params.path));
     if (req.params.pid) {
       address = getProgram(req.query.pid);
-      console.log( 'Address is:', address );
+      o.message( 'Address is:', address );
     }
     sendBackPlaylistWhenReady({config, address, res});
   });

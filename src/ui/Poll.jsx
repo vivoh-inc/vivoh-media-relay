@@ -1,37 +1,44 @@
 'use strict';
 
 const React = require('react');
-const { useState } = require( 'react');
+const { useState } = require('react');
 const PropTypes = require('prop-types');
-const { Text, Color } = require('ink');
+const { Text, Color, Box } = require('ink');
 const useInterval = require('./UseInterval');
 
 const Poll = ({ poll }) => {
-
   const [nextPoll, setNextPoll] = useState(0);
 
-  useInterval( () => {
+  useInterval(() => {
     let calc = nextPoll - 1;
-    if (nextPoll <= 0 ) {
+    if (nextPoll <= 0) {
       calc = poll.time;
     }
-    setNextPoll( calc );
-  }, 1000 );
+    setNextPoll(calc);
+  }, 1000);
 
   if (!poll) {
     return null;
   } else {
     return (
-    <>
-      <Text>
-        Poll Server: <Color green>{poll.url}</Color> [Checking again in: { nextPoll } seconds]
+      <Box paddingTop={1} height={4} flexDirection="column">
+        <Text>
+          Poll Server: <Color green>{poll.url}</Color>
+          {/* [Checking again in: { nextPoll } seconds] */}
+        </Text>
         {poll.error && (
-          <Color red>An error occurred with the poll server.</Color>
+          <Text>
+            <Color red>An error occurred contacting the poll server.</Color>
+          </Text>
         )}
-      </Text>
-      <Text> { JSON.stringify(poll.response) } </Text>
-    </>
-    )
+        {poll.response && (
+          <Text>
+            {' '}
+            <Color blue>JSON: {JSON.stringify(poll.response)}</Color>
+          </Text>
+        )}
+      </Box>
+    );
   }
 };
 
@@ -44,4 +51,3 @@ Poll.defaultProps = {
 };
 
 module.exports = Poll;
-

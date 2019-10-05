@@ -4,7 +4,6 @@ const tasklist = require('tasklist');
 const ps = require('ps-node');
 const path = require('path');
 const processFilter = require('./process_filter');
-const w = require('./output').write;
 const o = require('./output');
 const _config = require('./config');
 const pids = {};
@@ -33,7 +32,7 @@ module.exports.killProcesses = _ => {
     if (pid) {
       ps.kill(pid, err => {
         if (err) {
-          console.log('Error killing ffmpeg process');
+          o.errors('Error killing ffmpeg process');
         }
         else {
           killed.push(pid);
@@ -90,7 +89,7 @@ const isFfmpegRunning = (module.exports.isRunning = address => {
       })
       .catch(err => {
         e.errors('We got an error with ffmpeg');
-        console.log('We got an error with ffmpeg');
+        o.errors('We got an error with ffmpeg');
         reject(err);
       });
   });
@@ -138,13 +137,12 @@ const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
   const { address } = ffmpegConfig;
 
   if (!(exe && args)) {
-    console.log( 'NOPE!');
+    o.errors( 'Invalid arguments');
     return false;
   } else {
     const fullCommand = `\n\nffmpeg command: ${exe} ${args.join(' ')}\n\n`;
 
     writeLog(fullCommand);
-    // console.log(log);
     const ffmpeg = spawn(exe, args);
     ffmpeg.on('error', e => {
       writeLog(e);
@@ -163,12 +161,9 @@ const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
       connectedStreams[address] = false;
     });
 
-    console.log('Connected to multicast stream:', address);
-
+    o.message('Connected to multicast stream:' + address);
     pids[ffmpegConfig.address] = ffmpeg.pid;
-
-    w(o.startFfmpeg());
-
+    o.segmenter({status: 'starting'});
     return true;
   }
 });

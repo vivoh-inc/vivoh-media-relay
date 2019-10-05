@@ -86,7 +86,6 @@ describe('#server', () => {
           {poll: {url: 'http://foobar.com/foo.json'}},
           testOverrides
       ).then((_) => {
-        // expect( _processResponse.callCount).toBe(1);
         expect(_startServer.callCount).toBe(1);
         done();
       });

@@ -7,8 +7,8 @@ const Messages = ({ messages }) => {
     return null;
   } else {
     return messages.map(m => (
-      <Text>
-        <Color yellow>{m}</Color>
+      <Text key={m.timestamp}>
+        <Color yellow>{ new Date(m.timestamp).toString() }: {m.message}</Color>
       </Text>
     ));
   }
