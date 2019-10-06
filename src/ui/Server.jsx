@@ -13,7 +13,7 @@ const Server = (props) => {
     return (
       <Box height={3} flexDirection="column">
       <Text>Server status: {on ? <Color green>listening on { config.port }</Color> : <Color red>off</Color>}</Text>
-      { on && 
+      { on &&
       <Text>HLS: <Color blue>http://localhost:{ config.port }/hls.html?s={config.url}</Color></Text>
       }
       </Box>

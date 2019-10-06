@@ -7,6 +7,9 @@ const {
 const expect = require('expect');
 const sinon = require('sinon');
 
+const SINGLE_PROGRAM = require('../shared/v1/single_program.json');
+const MULTIPLE_PROGRAM = require('../shared/v1/multiple_program.json');
+
 describe('#server', () => {
   let myCheckPollServerForStatus;
   let myStartServer;
@@ -91,12 +94,13 @@ describe('#server', () => {
       });
     });
 
+
     it('should check the poll server and start ffmpeg if configured as such', (done) => {
       const response = {data: 'on'};
       const _axios = {get: sinon.stub().resolves(response)};
       const _startServer = sinon.spy();
       const launchIfNecessary = sinon.spy();
-      _processResponse.returns({isOn: true, mcastUrl: 'udp://239.0.0.1:1234', programId: 65432});
+      _processResponse.returns(SINGLE_PROGRAM);
       const testOverrides = {
         _setTimeout,
         _processResponse,
@@ -115,6 +119,31 @@ describe('#server', () => {
       });
     });
 
+    it('should check the poll server and start ffmpeg with multiple programs', (done) => {
+      const response = {data: 'on'};
+      const _axios = {get: sinon.stub().resolves(response)};
+      const _startServer = sinon.spy();
+      const launchIfNecessary = sinon.spy();
+      _processResponse.returns(SINGLE_PROGRAM);
+      const testOverrides = {
+        _setTimeout,
+        _processResponse,
+        _axios,
+        _startServer,
+        _loop: false,
+      };
+      checkPollServerForStatus(
+          {poll: {url: 'http://foobar.com/foo.json'},
+            segmenter: {launchIfNecessary}},
+          testOverrides
+      ).then((_) => {
+        expect(_startServer.callCount).toBe(1);
+        expect(launchIfNecessary.callCount).toBe(1);
+        done();
+      });
+    });
+
+
     it('should make a POST with CPU data to the poll server if configured as such', (done) => {
       const response = {data: 'on'};
       const _axios = {post: sinon.stub().resolves(response)};
@@ -127,7 +156,7 @@ describe('#server', () => {
       const services = sinon.spy();
       const networkInterfaces = sinon.spy();
 
-      _processResponse.returns({isOn: true, mcastUrl: 'udp://239.0.0.1:1234', programId: 65432});
+      _processResponse.returns(SINGLE_PROGRAM);
       const testOverrides = {
         _setTimeout,
         _processResponse,
@@ -144,7 +173,7 @@ describe('#server', () => {
         expect(_startServer.callCount).toBe(1);
         expect(launchIfNecessary.callCount).toBe(1);
         expect(cpu.callCount).toBe(1);
-        expect(_axios.post.args[0][1].systemInformation.cpu).toEqual({ cpuCount: 2});
+        expect(_axios.post.args[0][1].systemInformation.cpu).toEqual({cpuCount: 2});
         expect(mem.callCount).toBe(1);
         expect(currentLoad.callCount).toBe(1);
         expect(networkStats.callCount).toBe(1);
@@ -198,19 +227,18 @@ describe('#server', () => {
     });
 
     it( 'should contain extra information in response', () => {
-      const response = processReponse( {data: {on: true, programId: '12345', mcastUrl: 'udp://239.0.0.1:1234'}} );
-      expect(response.isOn).toBe(true);
-      expect(response.mcastUrl).toBe('udp://239.0.0.1:1234');
-      expect(response.programId).toBe('12345');
-    });
-
-    it( 'should process multiple programs', () => {
-      const response = processReponse( {data: {on: true, programs: [{ programId: '12345', mcastUrl: 'udp://239.0.0.1:1234' }] }} );
+      const response = processReponse( {data: SINGLE_PROGRAM} );
       expect(response.isOn).toBe(true);
       expect(response.programs[0].mcastUrl).toBe('udp://239.0.0.1:1234');
       expect(response.programs[0].programId).toBe('12345');
     });
 
-
+    it( 'should process multiple programs', () => {
+      const response = processReponse( {data: MULTIPLE_PROGRAM} );
+      expect(response.isOn).toBe(true);
+      expect(response.programs.length).toBe(2);
+      expect(response.programs[0].mcastUrl).toBe('udp://239.0.0.1:1234');
+      expect(response.programs[0].programId).toBe('12345');
+    });
   });
 });

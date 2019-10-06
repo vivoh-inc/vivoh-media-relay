@@ -1,0 +1,5 @@
+{
+  "vmrClientVersion" : "1.0.19",
+  "isOn": true,
+  "programs": [{ "mcastUrl": "udp://239.0.0.1:1234", "programId": 65432 }]
+}

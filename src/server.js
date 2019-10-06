@@ -80,28 +80,20 @@ const notifyListenError = () => {
 };
 
 const processResponse = (module.exports.processReponse = response => {
-  let { isOn = false, redirect = false, url, port, flags, credentials, programId, mcastUrl, startDateTime, endDateTime, pollInterval } = {};
+  let { isOn = false, port, credentials, programs, pollInterval } = {};
   if (typeof response.data === 'object') {
     if (response.data.on) {
       isOn = true;
-      redirect = 'redirect' === response.data.type;
-      url = response.data.url;
-      source = response.data.source;
       port = response.data.port;
-      flags = response.data.flags;
       credentials = response.data.credentials;
-      programs = response.data.programs
-      programId = response.data.programId;
-      mcastUrl = response.data.mcastUrl;
-      startDateTime = response.data.startDateTime;
-      endDateTime = response.data.endDateTime;
+      programs = response.data.programs;
       pollInterval = response.data.pollInterval;
     }
   } else if (0 === response.data.indexOf('on')) {
     isOn = true;
   }
 
-  return { isOn, redirect, url, port, flags, credentials,  programId, programs, mcastUrl, startDateTime, endDateTime, pollInterval  };
+  return { isOn, port, credentials, programs, pollInterval  };
 });
 
 const stopServer = (module.exports.stopServer = (config) => {
@@ -196,5 +188,5 @@ const convertCarefullyMergedToDynamic = (merged) => {
 }
 
 const hasProgram = module.exports.hasProgram = config => {
-  return (config.mcastUrl && config.programId);
+  return (config.programs && config.programs.length > 0);
 }

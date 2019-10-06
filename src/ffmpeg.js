@@ -34,19 +34,18 @@ module.exports.killProcesses = _ => {
       ps.kill(pid, err => {
         if (err) {
           o.errors('Error killing ffmpeg process');
-        }
-        else {
+        } else {
           killed.push(pid);
         }
       });
     }
   });
 
-  killed.forEach( k => {
+  killed.forEach(k => {
     delete pids[k];
   });
 
-  o.segmenter({status: 'off'});
+  o.segmenter({ status: 'off' });
 };
 
 module.exports.launchIfNecessary = function(config, dynamic) {
@@ -57,38 +56,39 @@ module.exports.launchIfNecessary = function(config, dynamic) {
 
     const { fixedDirectory, extras } = config;
 
-    const { address, programId, programs } = dynamic;
+    const { programs } = dynamic;
 
     if (!fixedDirectory) {
       reject(new Error('Invalid directory, internal error: ' + fixedDirectory));
     } else {
-
-      if (!programs) {
-        programs = [];
-        programs.push({ programId, address });
-      }
-
-      programs.forEach( program => {
-        isFfmpegRunning(p.address).then(running => {
-          if (running) {
-            o.segmenter( { running: { name: p.address, status: 'on'} });
-            resolve(true);
-          } else {
-            o.segmenter( { running: { name: p.address, status: 'starting'} });
-            if (
-              launchFfmpeg({
-                extras,
-                address: program.address,
-                fixedDirectory,
-                programId: program.programId,
-              })) {
+      if (!programs || !programs.length <= 0) {
+        resolve(true);
+      } else {
+        // Ignore the results other than notifying.
+        programs.forEach(program => {
+          isFfmpegRunning(p.address).then(running => {
+            if (running) {
+              o.updateSegmenter( p.address, { status: 'on'});
               resolve(true);
             } else {
-              reject(new Error(`Error launching ffmpeg for ${program.programId}`));
+              o.updateSegmenter( p.address, {status: 'starting'});
+              if (
+                launchFfmpeg({
+                  extras,
+                  address: program.address,
+                  fixedDirectory,
+                  programId: program.programId,
+                })
+              ) {
+                resolve(true);
+              } else {
+                o.updateSegmenter( p.address, { status: 'failed'});
+                resolve(false);
+              }
             }
-          }
+          });
         });
-      });
+      }
     }
   });
 };
@@ -122,7 +122,7 @@ const getArgumentsForFfmpeg = (module.exports.getArgumentsForFfmpeg = ({
   address,
   programId,
   fixedDirectory = _config.DEFAULT_FIXED_DIRECTORY,
-  extras
+  extras,
 } = {}) => {
   if (!address) {
     return {};
@@ -140,11 +140,11 @@ const getArgumentsForFfmpeg = (module.exports.getArgumentsForFfmpeg = ({
     logFile = extras.log;
   }
 
-  const fullPath = [ fixedDirectory ];
+  const fullPath = [fixedDirectory];
   if (programId) {
-    fullPath.push( programId );
+    fullPath.push(programId);
   }
-  fullPath.push( 'redirect.m3u8' );
+  fullPath.push('redirect.m3u8');
   args.push(path.join(...fullPath));
   return { args, exe };
 });
@@ -156,7 +156,7 @@ const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
   const { address } = ffmpegConfig;
 
   if (!(exe && args)) {
-    o.errors( 'Invalid arguments');
+    o.errors('Invalid arguments');
     return false;
   } else {
     const fullCommand = `\n\nffmpeg command: ${exe} ${args.join(' ')}\n\n`;
@@ -166,7 +166,7 @@ const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
     ffmpeg.on('error', e => {
       writeLog(e);
     });
-    ffmpeg.stdout.on('data', data => {
+    ffmpeg.stdout.on('data', _ => {
       // if (!connectedStreams[address]) {
       //   connectedStreams[address] = true;
       // }
@@ -182,7 +182,7 @@ const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
 
     o.message('Connected to multicast stream:' + address);
     pids[ffmpegConfig.address] = ffmpeg.pid;
-    o.segmenter({status: 'starting'});
+    o.segmenter({ status: 'starting' });
     return true;
   }
 });
