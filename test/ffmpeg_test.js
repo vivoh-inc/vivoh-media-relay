@@ -62,7 +62,6 @@ describe('#ffmpeg', () => {
         ],
       });
     });
-
   });
 
   describe('#checkForFfmpeg', () => {

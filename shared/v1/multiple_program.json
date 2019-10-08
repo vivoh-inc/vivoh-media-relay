@@ -1,8 +1,17 @@
 {
-  "vmrClientVersion" : "1.0.19",
-  "isOn": true,
   "programs": [
-    { "mcastUrl": "udp://239.0.0.1:1234", "programId": 65432 },
-    { "mcastUrl": "udp://240.0.0.1:1234", "programId": 65433 }
-  ]
+    {
+      "url": "http://mediaserver.vivoh.com/live/stream.m3u8",
+      "type": "redirect",
+      "on": true,
+      "programId": 1569763872572
+    },
+    {
+      "url": "http://mediaserver.vivoh.com/live/stream.m3u8",
+      "type": "redirect",
+      "on": true,
+      "programId": 1569763872572
+    }
+  ],
+  "on": true
 }
