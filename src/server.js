@@ -8,9 +8,12 @@ const o = require('./output');
 const { setupRoutes } = require('./routes');
 const { DEFAULT_POLLING_TIME } = require('./config');
 const { serverStatus } = require('./server_status');
+const version= require('./version').version;
 
 let app;
 let server;
+
+axios.defaults.headers['X_VMR_CLIENT_VERSION'] = version;
 
 module.exports.run = (
   config,
