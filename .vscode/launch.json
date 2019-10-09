@@ -165,7 +165,7 @@
       "request": "launch",
       "name": "Poll Mode with Ffmpeg Start and System Information",
       "program": "${workspaceFolder}/src/index.js",
-      "args": ["-t", "5", "-u", "http://localhost:9090/ffmpeg", "-s"]
+      "args": ["-t", "5", "-u", "http://localhost:8080/all.json", "--systemInformation"]
     },
     {
       "type": "node",

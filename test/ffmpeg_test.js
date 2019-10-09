@@ -2,7 +2,7 @@ const expect = require('expect');
 const sinon = require('sinon');
 const ffmpeg = require('../src/ffmpeg');
 
-const address = 'rtp://239.0.0.1:1234';
+const url = 'rtp://239.0.0.1:1234';
 
 describe('#ffmpeg', () => {
   describe('gets the correct arguments', () => {
@@ -14,7 +14,7 @@ describe('#ffmpeg', () => {
     });
 
     it('should work with just the address', () => {
-      const exeAndArgs = ffmpeg.getArgumentsForFfmpeg({address});
+      const exeAndArgs = ffmpeg.getArgumentsForFfmpeg({url});
       expect(exeAndArgs).toEqual({
         exe: 'ffmpeg',
         args: [
@@ -32,7 +32,7 @@ describe('#ffmpeg', () => {
     it('should permit extras', () => {
       const exeAndArgs = ffmpeg.getArgumentsForFfmpeg({
         extras: {extras: '-foobar -barfoo'},
-        address,
+        url,
       });
       expect(exeAndArgs).toEqual({
         exe: 'ffmpeg',
@@ -48,7 +48,7 @@ describe('#ffmpeg', () => {
 
     it('should work with a PID', () => {
       const exeAndArgs = ffmpeg.getArgumentsForFfmpeg({
-        address,
+        url,
         programId: '12345',
       });
       expect(exeAndArgs).toEqual({

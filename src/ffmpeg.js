@@ -69,15 +69,15 @@ module.exports.launchIfNecessary = function(config, dynamic,
 
     const promises = [];
     programs.forEach(p => {
-      const promise = _isFfmpegRunning(p.address).then(running => {
+      const promise = _isFfmpegRunning(p.url).then(running => {
         if (running) {
-          o.updateSegmenter( p.address, { status: 'on'});
+          o.updateSegmenter( p.url, { status: 'on'});
         } else {
-          o.updateSegmenter( p.address, {status: 'starting'});
-          if (!_launchFfmpeg({ extras, address: p.address,
-              fixedDirectory, programId: p.programId })
+          o.updateSegmenter( p.url, {status: 'starting'});
+          if (!_launchFfmpeg({ extras, url: p.url,
+              fixedDirectory: `${fixedDirectory}/${p.programId}`, programId: p.programId })
           ) {
-            o.updateSegmenter( p.address, { status: 'failed'});
+            o.updateSegmenter( p.url, { status: 'failed'});
           }
         }
       });
@@ -87,9 +87,9 @@ module.exports.launchIfNecessary = function(config, dynamic,
     return Promise.all(promises);
   };
 
-const isFfmpegRunning = (module.exports.isRunning = address => {
+const isFfmpegRunning = (module.exports.isRunning = url => {
   return new Promise((resolve, reject) => {
-    const pid = pids[address];
+    const pid = pids[url];
     listProcesses()
       .then(processes => {
         resolve(processFilter.pidIsRunning(processes, pid));
@@ -113,17 +113,17 @@ const getFfmpegBinary = () => {
 };
 
 const getArgumentsForFfmpeg = (module.exports.getArgumentsForFfmpeg = ({
-  address,
+  url,
   programId,
   fixedDirectory = _config.DEFAULT_FIXED_DIRECTORY,
   extras,
 } = {}) => {
-  if (!address) {
+  if (!url) {
     return {};
   }
 
   const exe = (extras && extras.bin) || getFfmpegBinary();
-  let args = ['-i', address];
+  let args = ['-i', url];
 
   if (extras && extras.extras) {
     args = args.concat(extras.extras.split(' '));
@@ -147,7 +147,7 @@ const connectedStreams = {};
 
 const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
   const { args, exe } = getArgumentsForFfmpeg(ffmpegConfig);
-  const { address } = ffmpegConfig;
+  const { url } = ffmpegConfig;
 
   if (!(exe && args)) {
     o.errors('Invalid arguments');
@@ -171,11 +171,11 @@ const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
     });
     ffmpeg.on('close', code => {
       writeLog(`FFMPEG close: ${code}`);
-      connectedStreams[address] = false;
+      connectedStreams[url] = false;
     });
 
-    o.message('Connected to multicast stream:' + address);
-    pids[ffmpegConfig.address] = ffmpeg.pid;
+    o.message('Connected to multicast stream:' + url);
+    pids[url] = ffmpeg.pid;
     o.segmenter({ status: 'starting' });
     return true;
   }
@@ -184,7 +184,7 @@ const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
 module.exports.checkForBinary = config => {
   // Test for ffmpeg, use a fake address to get the args correctly.
   return new Promise((resolve, reject) => {
-    const { exe } = getArgumentsForFfmpeg({ ...config, address: 'x.x.x.x' });
+    const { exe } = getArgumentsForFfmpeg({ ...config, url: 'x.x.x.x' });
     const ffmpeg = spawn(exe);
     ffmpeg.on('error', _ => {
       reject(exe);
