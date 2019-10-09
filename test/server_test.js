@@ -45,23 +45,23 @@ describe('#server', () => {
 
   it('should process the response for complex JSON', () => {
     const processed = processReponse({data: {on: true, type: 'redirect'}});
-    expect(processed.isOn).toBeTruthy();
+    expect(processed.on).toBeTruthy();
     expect(processed.redirect).toBeTruthy();
   });
 
   it('should process the response for complex JSON when off', () => {
     const processed = processReponse({data: {}});
-    expect(processed.isOn).toBeFalsy();
+    expect(processed.on).toBeFalsy();
   });
 
   it('should process the response for simple text with on', () => {
     const processed = processReponse({data: 'on'});
-    expect(processed.isOn).toBeTruthy();
+    expect(processed.on).toBeTruthy();
   });
 
   it('should process the response for simple text when off', () => {
     const processed = processReponse({data: 'off'});
-    expect(processed.isOn).toBeFalsy();
+    expect(processed.on).toBeFalsy();
   });
 
   describe('#checkPollServer', () => {
@@ -77,7 +77,7 @@ describe('#server', () => {
       const response = {data: 'on'};
       const _axios = {get: sinon.stub().resolves(response)};
       const _startServer = sinon.spy();
-      _processResponse.returns({isOn: true});
+      _processResponse.returns({on: true});
       const testOverrides = {
         _setTimeout,
         _processResponse,
@@ -187,7 +187,7 @@ describe('#server', () => {
       const response = {data: 'off'};
       const _axios = {get: sinon.stub().resolves(response)};
       const _stopServer = sinon.spy();
-      _processResponse.returns({isOn: false});
+      _processResponse.returns({on: false});
       const testOverrides = {
         _setTimeout,
         _processResponse,
@@ -223,22 +223,22 @@ describe('#server', () => {
   describe( '#processResponse', () => {
     it( 'should be on if response is on', () => {
       const response = processReponse( {data: {on: true}} );
-      expect(response.isOn).toBe(true);
+      expect(response.on).toBe(true);
     });
 
     it( 'should contain extra information in response', () => {
       const response = processReponse( {data: SINGLE_PROGRAM} );
-      expect(response.isOn).toBe(true);
-      expect(response.programs[0].mcastUrl).toBe('udp://239.0.0.1:1234');
-      expect(response.programs[0].programId).toBe('12345');
+      expect(response.on).toBe(true);
+      expect(response.programs[0].url).toBe('http://mediaserver.vivoh.com/live/stream.m3u8');
+      expect(response.programs[0].programId).toBe(1569763872572);
     });
 
     it( 'should process multiple programs', () => {
       const response = processReponse( {data: MULTIPLE_PROGRAM} );
-      expect(response.isOn).toBe(true);
+      expect(response.on).toBe(true);
       expect(response.programs.length).toBe(2);
-      expect(response.programs[0].mcastUrl).toBe('udp://239.0.0.1:1234');
-      expect(response.programs[0].programId).toBe('12345');
+      expect(response.programs[0].url).toBe('http://mediaserver.vivoh.com/live/stream.m3u8');
+      expect(response.programs[0].programId).toBe(1569763872572);
     });
   });
 });

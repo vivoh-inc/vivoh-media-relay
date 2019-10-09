@@ -80,20 +80,21 @@ const notifyListenError = () => {
 };
 
 const processResponse = (module.exports.processReponse = response => {
-  let { isOn = false, port, credentials, programs, pollInterval } = {};
+  let { on = false, port, credentials, programs, pollInterval, redirect } = {};
   if (typeof response.data === 'object') {
-    if (response.data.on) {
-      isOn = true;
+    if (response.data) {
       port = response.data.port;
       credentials = response.data.credentials;
       programs = response.data.programs;
       pollInterval = response.data.pollInterval;
+      on = response.data.on;
+      redirect = response.data.type === 'redirect';
     }
   } else if (0 === response.data.indexOf('on')) {
-    isOn = true;
+    on = true;
   }
 
-  return { isOn, port, credentials, programs, pollInterval  };
+  return { on, port, credentials, programs, pollInterval, redirect  };
 });
 
 const stopServer = (module.exports.stopServer = (config) => {
@@ -141,8 +142,8 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
         if (dynamic) {
           o.poll( { response: dynamic });
           o.message('Poll server request successful');
-          isOn = dynamic.isOn;
-          if (isOn) {
+          on = dynamic.on;
+          if (on) {
             o.poll({on: true});
             const carefullyMerged = { ...config };
             Object.keys(dynamic).forEach(k => {
