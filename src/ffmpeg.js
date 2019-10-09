@@ -136,6 +136,10 @@ const getArgumentsForFfmpeg = (module.exports.getArgumentsForFfmpeg = ({
   const fullPath = [fixedDirectory];
   if (programId) {
     fullPath.push(`${programId}`);
+    const pathRelative = path.join(...fullPath);
+    if (!fs.existsSync(pathRelative)) {
+      fs.mkdirSync(pathRelative);
+    }
   }
   fullPath.push('redirect.m3u8');
   args.push(path.join(...fullPath));

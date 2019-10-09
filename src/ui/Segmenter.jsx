@@ -2,7 +2,7 @@
 
 const React = require('react');
 const PropTypes = require('prop-types');
-const { Text, Color, Box } = require('ink');
+const { Text, Box } = require('ink');
 
 const Segmenter = ({segmenters}) => {
   return (
