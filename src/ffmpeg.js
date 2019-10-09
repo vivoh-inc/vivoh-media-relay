@@ -48,50 +48,44 @@ module.exports.killProcesses = _ => {
   o.segmenter({ status: 'off' });
 };
 
-module.exports.launchIfNecessary = function(config, dynamic) {
-  return new Promise((resolve, reject) => {
-    if (!(config && Object.keys(config).length != 0 && config.ipAddress)) {
-      reject(new Error('Invalid arguments provided, internal error.'));
-    }
-
+module.exports.launchIfNecessary = function(config, dynamic,
+    { _launchFfmpeg, _isFfmpegRunning } = { _launchFfmpeg: launchFfmpeg, _isFfmpegRunning: isFfmpegRunning }) {
     const { fixedDirectory, extras } = config;
-
     const { programs } = dynamic;
 
-    if (!fixedDirectory) {
-      reject(new Error('Invalid directory, internal error: ' + fixedDirectory));
-    } else {
-      if (!programs || !programs.length <= 0) {
-        resolve(true);
-      } else {
-        // Ignore the results other than notifying.
-        programs.forEach(program => {
-          isFfmpegRunning(p.address).then(running => {
-            if (running) {
-              o.updateSegmenter( p.address, { status: 'on'});
-              resolve(true);
-            } else {
-              o.updateSegmenter( p.address, {status: 'starting'});
-              if (
-                launchFfmpeg({
-                  extras,
-                  address: program.address,
-                  fixedDirectory,
-                  programId: program.programId,
-                })
-              ) {
-                resolve(true);
-              } else {
-                o.updateSegmenter( p.address, { status: 'failed'});
-                resolve(false);
-              }
-            }
-          });
-        });
-      }
+    if (!(config && Object.keys(config).length != 0 && config.ipAddress)) {
+      // throw new Error('Invalid arguments provided, internal error.');
+      return false;
     }
-  });
-};
+
+    if (!fixedDirectory) {
+      return false;
+      // throw new Error('Invalid directory, internal error: ' + fixedDirectory);
+    }
+
+    if (!programs || programs.length <= 0) {
+      return false;
+    }
+
+    const promises = [];
+    programs.forEach(p => {
+      const promise = _isFfmpegRunning(p.address).then(running => {
+        if (running) {
+          o.updateSegmenter( p.address, { status: 'on'});
+        } else {
+          o.updateSegmenter( p.address, {status: 'starting'});
+          if (!_launchFfmpeg({ extras, address: p.address,
+              fixedDirectory, programId: p.programId })
+          ) {
+            o.updateSegmenter( p.address, { status: 'failed'});
+          }
+        }
+      });
+      promises.push(promise);
+    });
+
+    return Promise.all(promises);
+  };
 
 const isFfmpegRunning = (module.exports.isRunning = address => {
   return new Promise((resolve, reject) => {

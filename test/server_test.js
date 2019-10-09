@@ -124,7 +124,7 @@ describe('#server', () => {
       const _axios = {get: sinon.stub().resolves(response)};
       const _startServer = sinon.spy();
       const launchIfNecessary = sinon.spy();
-      _processResponse.returns(SINGLE_PROGRAM);
+      _processResponse.returns(MULTIPLE_PROGRAM);
       const testOverrides = {
         _setTimeout,
         _processResponse,

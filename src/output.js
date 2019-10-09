@@ -8,7 +8,7 @@ let _renderer = {
   errors: () => {},
   poll: () => {},
   server: () => {},
-  segmenter: () => {},
+  updateSegmenter: () => {},
 };
 
 module.exports.setRenderer = (renderer) => _renderer = renderer;

@@ -57,6 +57,21 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Mocha Tests (ffmpeg)",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "args": [
+        "--timeout",
+        "999999",
+        "--colors",
+        "${workspaceFolder}/test",
+        "-g",
+        "#ffmpeg"
+      ],
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Mocha Tests (checkPollServer)",
       "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
       "args": [
