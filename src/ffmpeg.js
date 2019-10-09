@@ -45,7 +45,6 @@ module.exports.killProcesses = _ => {
     delete pids[k];
   });
 
-  o.segmenter({ status: 'off' });
 };
 
 module.exports.launchIfNecessary = function(config, dynamic,
@@ -75,7 +74,7 @@ module.exports.launchIfNecessary = function(config, dynamic,
         } else {
           o.updateSegmenter( p.url, {status: 'starting'});
           if (!_launchFfmpeg({ extras, url: p.url,
-              fixedDirectory: `${fixedDirectory}/${p.programId}`, programId: p.programId })
+              fixedDirectory, programId: p.programId })
           ) {
             o.updateSegmenter( p.url, { status: 'failed'});
           }
@@ -136,7 +135,7 @@ const getArgumentsForFfmpeg = (module.exports.getArgumentsForFfmpeg = ({
 
   const fullPath = [fixedDirectory];
   if (programId) {
-    fullPath.push(programId);
+    fullPath.push(`${programId}`);
   }
   fullPath.push('redirect.m3u8');
   args.push(path.join(...fullPath));
@@ -176,7 +175,7 @@ const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
 
     o.message('Connected to multicast stream:' + url);
     pids[url] = ffmpeg.pid;
-    o.segmenter({ status: 'starting' });
+    o.updateSegmenter(url, { status: 'starting' });
     return true;
   }
 });

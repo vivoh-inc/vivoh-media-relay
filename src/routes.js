@@ -1,14 +1,15 @@
 const path = require('path');
 const express = require('express');
 const {sendBackPlaylistWhenReady} = require('./playlist');
-const {convertPathToAddress, getAddress} = require('./address');
+const {convertPathToUrl, getUrl} = require('./address');
 const vivohMediaPlayers = require('vivoh-media-players');
 const ip = require('ip');
 const {isRunning} = require('./ffmpeg');
 const {getProgram} = require('./programs');
 const o = require('./output');
+const version = require('./version').version;
 
-let currentAddress;
+let currentUrl;
 
 module.exports.setupRoutes = ({type = 'hls', app, config}) => {
   app.use((_, res, next) => {
@@ -25,9 +26,9 @@ module.exports.setupRoutes = ({type = 'hls', app, config}) => {
   });
 
   app.get('/data*', (req, res) => {
-    isRunning(currentAddress).then( (ffmpegOn) => {
+    isRunning(currentUrl).then( (ffmpegOn) => {
       res.json({
-        Version: '1.3.4',
+        Version: version,
         VersionUpdated: '2019-08-29',
         Status: 'OK',
         IPAddress: ip.address(),
@@ -62,21 +63,21 @@ module.exports.setupRoutes = ({type = 'hls', app, config}) => {
   });
 
   app.get('/index.m3u8', (req, res) => {
-    let address = (currentAddress = getAddress(req.originalUrl));
+    let url = (currentUrl = getUrl(req.originalUrl));
     if (req.params.pid) {
-      address = getProgram(req.query.pid);
-      o.message( 'Address is:', address );
+      url = getProgram(req.query.pid);
+      o.message( 'URL is:', url );
     }
 
-    sendBackPlaylistWhenReady({config, address, res});
+    sendBackPlaylistWhenReady({config, url, res});
   });
 
   app.get('/:path/index.m3u8', (req, res) => {
-    let address = (currentAddress = convertPathToAddress(req.params.path));
+    let url = (currentUrl = convertPathToUrl(req.params.path));
     if (req.params.pid) {
-      address = getProgram(req.query.pid);
-      o.message( 'Address is:', address );
+      url = getProgram(req.query.pid);
+      o.message( 'Address is:', url );
     }
-    sendBackPlaylistWhenReady({config, address, res});
+    sendBackPlaylistWhenReady({config, url, res});
   });
 };

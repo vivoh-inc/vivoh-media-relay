@@ -19,21 +19,21 @@ const sendRedirectFile =
 
 const ifTsFilesAreReadyThenSend =
   module.exports.ifTsFilesAreReadyThenSend =
-    ({config, address, res, index = 0}) => {
+    ({config, url, res, index = 0}) => {
       dirUtils
           .isReadyToView(config.fixedDirectory)
           .then( (ready) => {
             if (ready && serverStatus.on) {
-              o.segmenter({status: 'ready'});
+              o.updateSegmenter(url, {status: 'ready'});
               sendRedirectFile(config.fixedDirectory, res);
             } else {
               if (serverStatus.on && index < RETRY_MAX) {
                 setTimeout(() => {
                   ifTsFilesAreReadyThenSend(
-                      {config, address, res,
+                      {config, url, res,
                         index: index + 1});
                 }, 1000);
-                o.segmenter({status: 'holding'});
+                o.updateSegmenter(url, {status: 'holding'});
               } else {
                 res.send('Error, timed out.');
               }
@@ -45,10 +45,10 @@ const ifTsFilesAreReadyThenSend =
           });
     };
 
-module.exports.sendBackPlaylistWhenReady = ({config, address, res}) => {
-  if (address) {
-    config.segmenter.launchIfNecessary(config, {address}).then((_) => {
-      ifTsFilesAreReadyThenSend({config, address, res});
+module.exports.sendBackPlaylistWhenReady = ({config, url, res}) => {
+  if (url) {
+    config.segmenter.launchIfNecessary(config, {url}).then((_) => {
+      ifTsFilesAreReadyThenSend({config, url, res});
     });
   }
 };

@@ -10,7 +10,7 @@ const Segmenter = ({segmenters}) => {
       { Object.keys( segmenters ).map( s => {
         return (
           <>
-          <Text>Segmenter address: {s.address }</Text>
+          <Text>Segmenter address: {s.url }</Text>
           <Text>Segmenter status: {s.status || 'off'}</Text>
           </>
           );
