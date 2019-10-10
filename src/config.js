@@ -80,8 +80,17 @@ module.exports.processConfig = (processedArguments) => {
       const files = [];
       fs.readdirSync(config.fixedDirectory).forEach((f) => {
         const fileToDelete = path.join(config.fixedDirectory, f);
-        files.push(fileToDelete);
-        fs.unlinkSync(fileToDelete);
+        const potentialDirectory = path.join(config.fixedDirectory, f);
+        if (fs.lstatSync(potentialDirectory).isDirectory()) {
+          fs.readdirSync(potentialDirectory).forEach( (f2) => {
+            const subdirFile = path.join(potentialDirectory, f2);
+            fs.unlinkSync(subdirFile);
+            files.push(subdirFile);
+          });
+        } else {
+          files.push(fileToDelete);
+          fs.unlinkSync(fileToDelete);
+        }
       });
       if (files.length > 0) {
         o.message(`Deleting files: ${files.join(', ')}`);

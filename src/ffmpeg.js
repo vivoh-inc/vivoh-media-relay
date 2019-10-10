@@ -52,18 +52,20 @@ module.exports.launchIfNecessary = function(config, dynamic,
     const { fixedDirectory, extras } = config;
     const { programs } = dynamic;
 
+    const emptyPromise = new Promise( (resolve) => resolve());
+
     if (!(config && Object.keys(config).length != 0 && config.ipAddress)) {
       // throw new Error('Invalid arguments provided, internal error.');
-      return false;
+      return emptyPromise;
     }
 
     if (!fixedDirectory) {
-      return false;
+      return emptyPromise;
       // throw new Error('Invalid directory, internal error: ' + fixedDirectory);
     }
 
     if (!programs || programs.length <= 0) {
-      return false;
+      return emptyPromise;
     }
 
     const promises = [];

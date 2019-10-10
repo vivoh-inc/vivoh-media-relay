@@ -23,11 +23,11 @@ const ifTsFilesAreReadyThenSend =
       dirUtils
           .isReadyToView(config.fixedDirectory)
           .then( (ready) => {
-            if (ready && serverStatus.on) {
+            if (ready) {
               o.updateSegmenter(url, {status: 'ready'});
               sendRedirectFile(config.fixedDirectory, res);
             } else {
-              if (serverStatus.on && index < RETRY_MAX) {
+              if (index < RETRY_MAX) {
                 setTimeout(() => {
                   ifTsFilesAreReadyThenSend(
                       {config, url, res,
