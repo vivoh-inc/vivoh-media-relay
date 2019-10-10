@@ -5,16 +5,5 @@ module.exports = {
     "env": {
         "es6": true
     },
-  "extends": ["eslint:recommended", "plugin:react/recommended"],
-
-"plugins": [
-
-	"react",
-    "react-hooks"
-  ],
-  "rules": {
-    "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn"
-  }
-
+    "extends": "google"
 };
