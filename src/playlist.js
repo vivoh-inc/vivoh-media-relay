@@ -25,7 +25,7 @@ const sendRedirectFile =
   module.exports.sendRedirectFile = (fixedDirectory, res, programId) => {
     const redirect = path.join(fixedDirectory, 'redirect.m3u8');
     const contents = fs.readFileSync(redirect).toString();
-    const rewitten = rewriteM3u8File(contents, programId);
+    const rewritten = rewriteM3u8File(contents, programId);
     res.set('Content-Type', mime.M3U8_MIME);
     res.send(rewritten);
   };
@@ -44,7 +44,7 @@ const ifTsFilesAreReadyThenSend =
             .then( (ready) => {
               if (ready && serverStatus.on) {
                 o.updateSegmenter(url, {status: 'ready'});
-                sendRedirectFile(programDir, res);
+                sendRedirectFile(programDir, res, program.programId);
               } else {
                 if (serverStatus.on && index < RETRY_MAX) {
                   setTimeout(() => {
