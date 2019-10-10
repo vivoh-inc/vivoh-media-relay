@@ -2,8 +2,8 @@ const React = require('react');
 const {render} = require('ink-testing-library');
 const importJsx = require('import-jsx');
 const expect = require('expect');
-const Server = importJsx('../src/ui/Server.jsx');
-const Programs = importJsx('../src/ui/Programs.jsx');
+const Server = importJsx('../src/ui/Server.js');
+const Programs = importJsx('../src/ui/Programs.js');
 const stripAnsi = require('strip-ansi');
 
 describe('#ui', () => {

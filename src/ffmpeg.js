@@ -64,29 +64,35 @@ module.exports.launchIfNecessary = function(config, dynamic,
       // throw new Error('Invalid directory, internal error: ' + fixedDirectory);
     }
 
-    if (!programs || programs.length <= 0) {
-      return emptyPromise;
-    }
-
     const promises = [];
-    programs.forEach(p => {
-      const promise = _isFfmpegRunning(p.url).then(running => {
-        if (running) {
-          o.updateSegmenter( p.url, { status: 'on'});
-        } else {
-          o.updateSegmenter( p.url, {status: 'starting'});
-          if (!_launchFfmpeg({ extras, url: p.url,
-              fixedDirectory, programId: p.programId })
-          ) {
-            o.updateSegmenter( p.url, { status: 'failed'});
-          }
-        }
+
+    if (!programs || programs.length <= 0) {
+      promises.push(getFfmpegPromise( { url: dynamic.url, fixedDirectory, extras, _launchFfmpeg, _isFfmpegRunning }));
+    }
+    else {
+      programs.forEach(p => {
+        const promise = getFfmpegPromise({...p, extras, fixedDirectory, _isFfmpegRunning, _launchFfmpeg});
+        promises.push(promise);
       });
-      promises.push(promise);
-    });
+    }
 
     return Promise.all(promises);
   };
+
+  const getFfmpegPromise = ( { url, extras, programId, fixedDirectory, _isFfmpegRunning, _launchFfmpeg }) => {
+    return _isFfmpegRunning(url).then(running => {
+      if (running) {
+        o.updateSegmenter( url, { status: 'on'});
+      } else {
+        o.updateSegmenter( url, {status: 'starting'});
+        if (!_launchFfmpeg({ extras, url,
+            fixedDirectory, programId})
+        ) {
+          o.updateSegmenter( url, { status: 'failed'});
+        }
+      }
+    });
+  }
 
 const isFfmpegRunning = (module.exports.isRunning = url => {
   return new Promise((resolve, reject) => {
@@ -150,7 +156,7 @@ const getArgumentsForFfmpeg = (module.exports.getArgumentsForFfmpeg = ({
 
 const connectedStreams = {};
 
-const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
+const launchFfmpeg = (module.exports.launchFfmpeg = (ffmpegConfig) => {
   const { args, exe } = getArgumentsForFfmpeg(ffmpegConfig);
   const { url } = ffmpegConfig;
 

@@ -8,10 +8,11 @@
       "type": "node",
       "request": "launch",
       "name": "Simple",
-      "program": "${workspaceFolder}/src/index.js"
+      "program": "${workspaceFolder}/src/index.js",
       // "args" : [
       //     "-p", "6060"
       // ]
+      "internalConsoleOptions": "openOnSessionStart"
     },
     {
       "type": "node",

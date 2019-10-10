@@ -20,7 +20,7 @@ const Segmenter = ({segmenters, config}) => {
         return (
           <Box key={s.url} flexDirection="column">
           <Text><Color red>{s.url}</Color>: {(s.status || 'off').trim().toUpperCase()}</Text>
-          { on &&
+          { s.on &&
             <Text> (<Color blue>http://localhost:{ config.port }/hls.html?s={s.url})</Color></Text>
             }
           </Box>
