@@ -1,16 +1,28 @@
 const React = require('react');
 const PropTypes = require('prop-types');
-const { Text, Color } = require('ink');
+const {Text, Color} = require('ink');
 
-const Messages = ({ messages }) => {
+const Messages = ({messages}) => {
   if (!messages || !messages.length) {
     return null;
   } else {
-    return messages.map(m => (
-      <Text key={m.timestamp}>
-        <Color yellow>{ new Date(m.timestamp).toString() }: {m.message}</Color>
-      </Text>
-    ));
+    return messages.map((m) =>
+      React.createElement(
+          Text,
+          {
+            key: m.timestamp,
+          },
+          React.createElement(
+              Color,
+              {
+                yellow: true,
+              },
+              new Date(m.timestamp).toString(),
+              ': ',
+              m.message
+          )
+      )
+    );
   }
 };
 

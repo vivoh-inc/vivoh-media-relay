@@ -25,10 +25,11 @@ const writeLog = m => {
 module.exports.name = 'ffmpeg';
 
 module.exports.killProcesses = _ => {
-  const _pids = Object.values(pids);
+  const _urls = Object.keys(pids);
 
   const killed = [];
-  _pids.forEach(pid => {
+  _urls.forEach(url => {
+    const pid = pids[url];
     if (pid) {
       console.log('Killing ffmpeg pid: ', pid);
       ps.kill(pid, err => {
@@ -36,6 +37,7 @@ module.exports.killProcesses = _ => {
           o.errors('Error killing ffmpeg process');
         } else {
           killed.push(pid);
+          o.updateSegmenter(url, { status: 'off'});
         }
       });
     }
@@ -185,7 +187,7 @@ const launchFfmpeg = (module.exports.launchFfmpeg = (ffmpegConfig) => {
       connectedStreams[url] = false;
     });
 
-    o.message('Connected to multicast stream:' + url);
+    o.message('Connected to multicast stream: ' + url);
     pids[url] = ffmpeg.pid;
     o.updateSegmenter(url, { status: 'starting' });
     return true;

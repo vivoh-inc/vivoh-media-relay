@@ -2,32 +2,72 @@
 
 const React = require('react');
 const PropTypes = require('prop-types');
-const { Text, Box, Color } = require('ink');
+const {Text, Box, Color} = require('ink');
 
 const Segmenter = ({segmenters, config}) => {
+  const _segmenters = Object.keys(segmenters).map((s) => {
+    segmenters[s].url = s;
+    return segmenters[s];
+  });
 
-  // console.log( Object.keys(segmenters).map( s => JSON.stringify(s)).join( '\n\n'));
-  // process.exit(-1);
-
-  const _segmenters = Object.keys( segmenters ).map( s => { segmenters[s].url = s; return segmenters[s]} );
-  // console.log( _segmenters.map( s => JSON.stringify(s)).join( '\n\n'));
-  // process.exit(-1);
-
-  return (
-    <Box  paddingBottom={1} paddingTop={1} flexDirection="column">
-      <Text><Color blue>Segmenters</Color></Text>
-      { _segmenters.map( s => {
-        return (
-          <Box key={s.url} flexDirection="column">
-          <Text><Color red>{s.url}</Color>: {(s.status || 'off').trim().toUpperCase()}</Text>
-          { s.on &&
-            <Text> (<Color blue>http://localhost:{ config.port }/hls.html?s={s.url})</Color></Text>
-            }
-          </Box>
-        )
-      })};
-    </Box>
-  )
+  return React.createElement(
+      Box,
+      {
+        paddingBottom: 1,
+        paddingTop: 1,
+        flexDirection: 'column',
+      },
+      React.createElement(
+          Text,
+          null,
+          React.createElement(
+              Color,
+              {
+                blue: true,
+              },
+              'Segmenters'
+          )
+      ),
+      _segmenters.map((s) => {
+        return React.createElement(
+            Box,
+            {
+              key: s.url,
+              flexDirection: 'column',
+            },
+            React.createElement(
+                Text,
+                null,
+                React.createElement(
+                    Color,
+                    {
+                      red: true,
+                    },
+                    s.url
+                ),
+                ': ',
+                (s.status || 'off').trim().toUpperCase()
+            ),
+            s.on &&
+          React.createElement(
+              Text,
+              null,
+              ' (',
+              React.createElement(
+                  Color,
+                  {
+                    blue: true,
+                  },
+                  'http://localhost:',
+                  config.port,
+                  '/hls.html?s=',
+                  s.url,
+                  ')'
+              )
+          )
+        );
+      })
+  );
 };
 
 Segmenter.propTypes = {

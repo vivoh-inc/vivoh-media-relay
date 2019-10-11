@@ -1,16 +1,39 @@
-
 const React = require('react');
 const PropTypes = require('prop-types');
-const { Text, Color } = require('ink');
+const {Text, Color} = require('ink');
 
-const Errors = ( { errors }) => {
+const Errors = ({errors}) => {
   if (!errors || !errors.length) {
     return null;
   } else {
-      return (<>
-      <Text><Color red>Errors:</Color></Text>
-      { errors.map(e => <Text><Color grey>{e}</Color></Text>) }
-      </>);
+    return React.createElement(
+        React.Fragment,
+        null,
+        React.createElement(
+            Text,
+            null,
+            React.createElement(
+                Color,
+                {
+                  red: true,
+                },
+                'Errors:'
+            )
+        ),
+        errors.map((e) =>
+          React.createElement(
+              Text,
+              null,
+              React.createElement(
+                  Color,
+                  {
+                    grey: true,
+                  },
+                  e
+              )
+          )
+        )
+    );
   }
 };
 

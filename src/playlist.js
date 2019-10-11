@@ -39,7 +39,7 @@ const ifTsFilesAreReadyThenSend =
     ({config, url, res, index = 0}) => {
       // TODO: need to check for the PID inside the fixed Directory
       // Better yet, add the correct directory+pid to the program?
-      const programDir = config.fixedDirectory;
+      let programDir = config.fixedDirectory;
       let programId;
       if (config.programs && config.programs.length > 0) {
         const program = config.programs.find((p) => p.url === url);

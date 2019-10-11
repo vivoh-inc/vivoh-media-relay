@@ -1,21 +1,34 @@
 const React = require('react');
 const PropTypes = require('prop-types');
-const { Text, Color } = require('ink');
+const {Text, Color} = require('ink');
 
-const Programs = ({ programs }) => {
+const Programs = ({programs}) => {
   if (!programs || !programs.length) {
     return null;
   } else {
-    return programs.map(p => (
-      <Text key={p.name}>
-        <Color yellow>{p.name} [{ p.id }] </Color>
-      </Text>
-    ));
+    return programs.map((p) =>
+      React.createElement(
+          Text,
+          {
+            key: p.name,
+          },
+          React.createElement(
+              Color,
+              {
+                yellow: true,
+              },
+              p.name,
+              ' [',
+              p.id,
+              '] '
+          )
+      )
+    );
   }
 };
 
 Programs.propTypes = {
-programs: PropTypes.array,
+  programs: PropTypes.array,
 };
 
 Programs.defaultProps = {
