@@ -91,16 +91,20 @@ const App = ({startFn}) => {
   const addMessage = (msg) => {
     try {
       setMessages((_msgs) => {
-        if (_msgs.length >= 5) {
+        if (_msgs.length >= 10) {
           _msgs.pop();
         }
-        // Not sure why this is necessary, but otherwise we get each message twice.
-        // if (_msgs[0] === msg) {
-        // 	return _msgs;
-        // }
-        // else {
-        return [{message: msg, timestamp: new Date().getTime()}, ..._msgs];
-        // }
+        if (_msgs.length > 0 && _msgs[0].message === msg) {
+          // Bump the count and time, but don't add to it.
+          _msgs[0].count = _msgs[0].count + 1;
+          _msgs[0].timestamp = new Date().getTime();
+          return [..._msgs];
+        } else {
+          return [{count: 0,
+            message: msg,
+            timestamp: new Date().getTime()},
+          ..._msgs];
+        }
       });
     } catch (err) {
       writeError(err);

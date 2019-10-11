@@ -11,6 +11,7 @@ module.exports.setConfig = (cfg) => config = cfg;
 const rewriteM3u8File = module.exports.rewriteM3u8File = (contents, programId) => {
   const lines = contents.split('\n');
   const rewritten = [];
+  o.message(`Rewriting and delivering M3U8 file for ${programId}`);
   lines.forEach( (l) => {
     if (l.endsWith('.ts')) {
       rewritten.push( `${programId}/${l}`);
@@ -29,6 +30,7 @@ const sendRedirectFile =
     if (programId) {
       rewritten = rewriteM3u8File(contents, programId);
     }
+    o.message( 'Delivering M3U8 file');
     res.set('Content-Type', mime.M3U8_MIME);
     res.send(rewritten);
   };

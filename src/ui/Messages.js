@@ -19,7 +19,7 @@ const Messages = ({messages}) => {
               },
               new Date(m.timestamp).toString(),
               ': ',
-              m.message
+              ( m.message + ( m.count > 0 ? ` (${m.count})` : '' ) )
           )
       )
     );

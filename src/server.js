@@ -33,6 +33,10 @@ module.exports.run = (
   }
 };
 
+const notifyDeliveryOfTsFile = (path, programId) => {
+  o.message( `Delivering TS File: ${path + ( programId ? ('/' + programId ) : '' ) }`);
+};
+
 const startServer = (module.exports.startServer = config => {
   if (!app) {
     if (server) {
@@ -53,12 +57,14 @@ const startServer = (module.exports.startServer = config => {
     app.get('/:path/:tsFile', function(req, res) {
       const path = req.params.tsFile;
       res.sendFile(path, { root: config.fixedDirectory });
+      notifyDeliveryOfTsFile(path, programId);
     });
 
     app.get('/:path/:programId/:tsFile', function(req, res) {
       const path = req.params.tsFile;
       const programId = req.params.programId;
       res.sendFile(path, { root: path.join(config.fixedDirectory, programId) });
+      notifyDeliveryOfTsFile(path, programId);
     });
 
     if (config.credentials) {

@@ -105,6 +105,7 @@ module.exports.processConfig = (processedArguments) => {
     ? getCredentials(processedArguments.e)
     : undefined;
 
+  
   // config.segmenterName = processedArguments.s !== 'tsduck' ? 'ffmpeg' : 'tsduck';
   // config.segmenter = config.segmenterName === 'ffmpeg' ? ffmpegSegmenter : tsduckSegmenter;
 
