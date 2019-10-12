@@ -38,7 +38,7 @@ module.exports.setupRoutes = ({type = 'hls', app, config}) => {
   });
 
   app.get('/status*', (req, res) => {
-    isRunning(currentAddress).then( (ffmpegOn) => {
+    isRunning(currentUrl).then( (ffmpegOn) => {
       res.send(`
       <html>
       <body>
@@ -47,7 +47,6 @@ module.exports.setupRoutes = ({type = 'hls', app, config}) => {
       <div>FFmpeg is: ${ffmpegOn ? 'on' : 'off'}</div>
       </body>
       </html>
-      
       `);
     });
   });

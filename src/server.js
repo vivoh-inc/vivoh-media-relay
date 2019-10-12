@@ -8,7 +8,9 @@ const o = require('./output');
 const { setupRoutes } = require('./routes');
 const { DEFAULT_POLLING_TIME } = require('./config');
 const { serverStatus } = require('./server_status');
+const { getProgram} = require('./programs');
 const version= require('./version').version;
+const { addProgram, clearPrograms } = require('./programs');
 
 let app;
 let server;
@@ -53,6 +55,18 @@ const startServer = (module.exports.startServer = config => {
         }
       })
     );
+
+    app.get('/pid/:pid/index.m3u8', (req,res) => {
+      const { pid } = req.params;
+      res.redirect(`/${pid}/index.m3u8`);
+    });
+
+    app.get('/pid/:pid/hls.html', (req,res) => {
+      const { pid } = req.params;
+      const program = getProgram(pid);
+      // Get program redirect to the HLS.html?s=URL
+      res.redirect(`/hls.html?s=${program.url}`);
+    });
 
     app.get('/:path/:tsFile', function(req, res) {
       const path = req.params.tsFile;
@@ -163,6 +177,12 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
             _startServer(carefullyMerged);
 
             if (hasProgram(carefullyMerged)) {
+              // Add the programs to our list.
+              // clearPrograms();
+              carefullyMerged.programs.forEach( p => {
+                addProgram(p.programId, p);
+              });
+
               const dynamic = convertCarefullyMergedToDynamic(carefullyMerged);
               config.segmenter.launchIfNecessary(config, dynamic);
             }
