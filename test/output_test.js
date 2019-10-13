@@ -17,10 +17,8 @@ describe('#ui', () => {
       const config = {url: 'udp://239.0.0.1:1234', port: 4567};
       const {lastFrame} = render(React.createElement(Server, {server: {on: true, config}}));
       const rendered = stripAnsi(lastFrame());
-      const msg = `Server status: listening on 4567
-HLS: http://localhost:4567/hls.html?s=udp://239.0.0.1:1234
-`;
-      expect(rendered).toEqual(msg);
+      const msg = `Server status: listening on 4567`;
+      expect(rendered.trim()).toEqual(msg.trim());
     });
   });
 
