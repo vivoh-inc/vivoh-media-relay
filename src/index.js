@@ -8,7 +8,7 @@ const {usage} = require('./usage');
 // Update path to add cwd
 process.env.PATH = `${process.env.PATH}:.`;
 
-const app = require('./ui/cli').app;
+const app = require('./cli').app;
 
 const startFn = (renderer) => {
   o.setRenderer(renderer);

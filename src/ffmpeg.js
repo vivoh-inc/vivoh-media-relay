@@ -25,68 +25,80 @@ const writeLog = m => {
 module.exports.name = 'ffmpeg';
 
 module.exports.killProcesses = _ => {
-  const _pids = Object.values(pids);
+  const _urls = Object.keys(pids);
 
   const killed = [];
-  _pids.forEach(pid => {
+  _urls.forEach(url => {
+    const pid = pids[url];
     if (pid) {
       console.log('Killing ffmpeg pid: ', pid);
       ps.kill(pid, err => {
         if (err) {
           o.errors('Error killing ffmpeg process');
-        }
-        else {
+        } else {
           killed.push(pid);
+          o.updateSegmenter(url, { status: 'off'});
         }
       });
     }
   });
 
-  killed.forEach( k => {
+  killed.forEach(k => {
     delete pids[k];
   });
 
-  o.segmenter({status: 'off'});
 };
 
-module.exports.launchIfNecessary = function(config, dynamic) {
-  return new Promise((resolve, reject) => {
-    if (!(config && Object.keys(config).length != 0 && config.ipAddress)) {
-      reject(new Error('Invalid arguments provided, internal error.'));
-    }
-
+module.exports.launchIfNecessary = function(config, dynamic,
+    { _launchFfmpeg, _isFfmpegRunning } = { _launchFfmpeg: launchFfmpeg, _isFfmpegRunning: isFfmpegRunning }) {
     const { fixedDirectory, extras } = config;
+    const { programs } = dynamic;
 
-    const { address, programId } = dynamic;
+    const emptyPromise = new Promise( (resolve) => resolve());
+
+    if (!(config && Object.keys(config).length != 0 && config.ipAddress)) {
+      // throw new Error('Invalid arguments provided, internal error.');
+      return emptyPromise;
+    }
 
     if (!fixedDirectory) {
-      reject(new Error('Invalid directory, internal error: ' + fixedDirectory));
-    } else {
-      isFfmpegRunning(address).then(running => {
-        if (running) {
-          resolve(true);
-        } else {
-          if (
-            launchFfmpeg({
-              extras,
-              address,
-              fixedDirectory,
-              programId,
-            })
-          ) {
-            resolve(true);
-          } else {
-            reject(new Error('Error launching ffmpeg'));
-          }
-        }
+      return emptyPromise;
+      // throw new Error('Invalid directory, internal error: ' + fixedDirectory);
+    }
+
+    const promises = [];
+
+    if (!programs || programs.length <= 0) {
+      promises.push(getFfmpegPromise( { url: dynamic.url, fixedDirectory, extras, _launchFfmpeg, _isFfmpegRunning }));
+    }
+    else {
+      programs.forEach(p => {
+        const promise = getFfmpegPromise({...p, extras, fixedDirectory, _isFfmpegRunning, _launchFfmpeg});
+        promises.push(promise);
       });
     }
-  });
-};
 
-const isFfmpegRunning = (module.exports.isRunning = address => {
+    return Promise.all(promises);
+  };
+
+  const getFfmpegPromise = ( { url, extras, programId, fixedDirectory, _isFfmpegRunning, _launchFfmpeg }) => {
+    return _isFfmpegRunning(url).then(running => {
+      if (running) {
+        o.updateSegmenter( url, { status: 'on'});
+      } else {
+        o.updateSegmenter( url, {status: 'starting'});
+        if (!_launchFfmpeg({ extras, url,
+            fixedDirectory, programId})
+        ) {
+          o.updateSegmenter( url, { status: 'failed'});
+        }
+      }
+    });
+  }
+
+const isFfmpegRunning = (module.exports.isRunning = url => {
   return new Promise((resolve, reject) => {
-    const pid = pids[address];
+    const pid = pids[url];
     listProcesses()
       .then(processes => {
         resolve(processFilter.pidIsRunning(processes, pid));
@@ -110,17 +122,17 @@ const getFfmpegBinary = () => {
 };
 
 const getArgumentsForFfmpeg = (module.exports.getArgumentsForFfmpeg = ({
-  address,
+  url,
   programId,
   fixedDirectory = _config.DEFAULT_FIXED_DIRECTORY,
-  extras
+  extras,
 } = {}) => {
-  if (!address) {
+  if (!url) {
     return {};
   }
 
   const exe = (extras && extras.bin) || getFfmpegBinary();
-  let args = ['-i', address];
+  let args = ['-i', url];
 
   if (extras && extras.extras) {
     args = args.concat(extras.extras.split(' '));
@@ -131,23 +143,27 @@ const getArgumentsForFfmpeg = (module.exports.getArgumentsForFfmpeg = ({
     logFile = extras.log;
   }
 
-  const fullPath = [ fixedDirectory ];
+  const fullPath = [fixedDirectory];
   if (programId) {
-    fullPath.push( programId );
+    fullPath.push(`${programId}`);
+    const pathRelative = path.join(...fullPath);
+    if (!fs.existsSync(pathRelative)) {
+      fs.mkdirSync(pathRelative);
+    }
   }
-  fullPath.push( 'redirect.m3u8' );
+  fullPath.push('redirect.m3u8');
   args.push(path.join(...fullPath));
   return { args, exe };
 });
 
 const connectedStreams = {};
 
-const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
+const launchFfmpeg = (module.exports.launchFfmpeg = (ffmpegConfig) => {
   const { args, exe } = getArgumentsForFfmpeg(ffmpegConfig);
-  const { address } = ffmpegConfig;
+  const { url } = ffmpegConfig;
 
   if (!(exe && args)) {
-    o.errors( 'Invalid arguments');
+    o.errors('Invalid arguments');
     return false;
   } else {
     const fullCommand = `\n\nffmpeg command: ${exe} ${args.join(' ')}\n\n`;
@@ -157,7 +173,7 @@ const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
     ffmpeg.on('error', e => {
       writeLog(e);
     });
-    ffmpeg.stdout.on('data', data => {
+    ffmpeg.stdout.on('data', _ => {
       // if (!connectedStreams[address]) {
       //   connectedStreams[address] = true;
       // }
@@ -168,12 +184,12 @@ const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
     });
     ffmpeg.on('close', code => {
       writeLog(`FFMPEG close: ${code}`);
-      connectedStreams[address] = false;
+      connectedStreams[url] = false;
     });
 
-    o.message('Connected to multicast stream:' + address);
-    pids[ffmpegConfig.address] = ffmpeg.pid;
-    o.segmenter({status: 'starting'});
+    o.message('Connected to multicast stream: ' + url);
+    pids[url] = ffmpeg.pid;
+    o.updateSegmenter(url, { status: 'starting' });
     return true;
   }
 });
@@ -181,7 +197,7 @@ const launchFfmpeg = (module.exports.launchFfmpeg = ffmpegConfig => {
 module.exports.checkForBinary = config => {
   // Test for ffmpeg, use a fake address to get the args correctly.
   return new Promise((resolve, reject) => {
-    const { exe } = getArgumentsForFfmpeg({ ...config, address: 'x.x.x.x' });
+    const { exe } = getArgumentsForFfmpeg({ ...config, url: 'x.x.x.x' });
     const ffmpeg = spawn(exe);
     ffmpeg.on('error', _ => {
       reject(exe);

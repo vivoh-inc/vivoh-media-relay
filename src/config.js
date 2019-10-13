@@ -80,8 +80,17 @@ module.exports.processConfig = (processedArguments) => {
       const files = [];
       fs.readdirSync(config.fixedDirectory).forEach((f) => {
         const fileToDelete = path.join(config.fixedDirectory, f);
-        files.push(fileToDelete);
-        fs.unlinkSync(fileToDelete);
+        const potentialDirectory = path.join(config.fixedDirectory, f);
+        if (fs.lstatSync(potentialDirectory).isDirectory()) {
+          fs.readdirSync(potentialDirectory).forEach( (f2) => {
+            const subdirFile = path.join(potentialDirectory, f2);
+            fs.unlinkSync(subdirFile);
+            files.push(subdirFile);
+          });
+        } else {
+          files.push(fileToDelete);
+          fs.unlinkSync(fileToDelete);
+        }
       });
       if (files.length > 0) {
         o.message(`Deleting files: ${files.join(', ')}`);
@@ -96,8 +105,19 @@ module.exports.processConfig = (processedArguments) => {
     ? getCredentials(processedArguments.e)
     : undefined;
 
-  config.segmenterName = processedArguments.s !== 'tsduck' ? 'ffmpeg' : 'tsduck';
-  config.segmenter = config.segmenterName === 'ffmpeg' ? ffmpegSegmenter : tsduckSegmenter;
+  
+  // config.segmenterName = processedArguments.s !== 'tsduck' ? 'ffmpeg' : 'tsduck';
+  // config.segmenter = config.segmenterName === 'ffmpeg' ? ffmpegSegmenter : tsduckSegmenter;
+
+  if (processedArguments.s === 'tsduck') {
+    // Fatal error, not supported with this build.
+    console.error( 'ERROR: TSDuck not supported in this version.');
+    process.exit(-1);
+  }
+
+  config.segmenterName = 'ffmpeg';
+  config.segmenter = ffmpegSegmenter;
+
   config.extras = getExtras(processedArguments, config.segmenterName);
   config.overwrite = processedArguments.o;
   config.logFormat = processedArguments.l || processedArguments.logFormat;

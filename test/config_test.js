@@ -17,7 +17,7 @@ describe('#config', () => {
       expect(config.segmenterName).toBe('ffmpeg');
     });
 
-    it( 'should get tsduck if we ask for it ', () => {
+    it.skip( 'should get tsduck if we ask for it ', () => {
       const config = processConfig({s: 'tsduck'});
       expect(config.segmenterName).toBe('tsduck');
       expect(config.segmenter.checkForBinary).toBeTruthy();
@@ -37,7 +37,7 @@ describe('#config', () => {
       expect(config.extras.bin).toBe('ffmpeg.exe');
     });
 
-    it( 'should get the tsduck extras ', () => {
+    it.skip( 'should get the tsduck extras ', () => {
       const config = processConfig({s: 'tsduck', tsduckExtras: '-b -c', tsduckBin: 'tsduck.APP'});
       expect(config.extras.extras).toBe('-b -c');
       expect(config.extras.bin).toBe('tsduck.APP');

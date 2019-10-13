@@ -1,5 +1,7 @@
-const React = require('react');
-const { useEffect, useRef } = require('react');
+/* eslint-disable require-jsdoc */
+
+// const React = require('react');
+const {useEffect, useRef} = require('react');
 
 function useInterval(callback, delay) {
   const savedCallback = useRef();
@@ -15,7 +17,7 @@ function useInterval(callback, delay) {
       savedCallback.current();
     }
     if (delay !== null) {
-      let id = setInterval(tick, delay);
+      const id = setInterval(tick, delay);
       return () => clearInterval(id);
     }
   }, [delay]);

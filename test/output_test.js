@@ -1,26 +1,23 @@
 const React = require('react');
 const {render} = require('ink-testing-library');
-const importJsx = require('import-jsx');
 const expect = require('expect');
-const Server = importJsx('../src/ui/Server.jsx');
-const Programs = importJsx('../src/ui/Programs.jsx');
+const Server = require('../src/ui/Server');
+const Programs = require('../src/ui/Programs.js');
 const stripAnsi = require('strip-ansi');
 
 describe('#ui', () => {
   describe('#Server', () => {
     it('should display off when nothing is provided', () => {
-      const {lastFrame} = render(React.createElement(Server, { server: {} }));
+      const {lastFrame} = render(React.createElement(Server, {server: {}}));
       const rendered = stripAnsi(lastFrame());
       expect(rendered).toEqual('Server status: off\n\n');
     });
     it('should display on when server is on', () => {
-      const config = { url: 'udp://239.0.0.1:1234', port: 4567};
-      const {lastFrame} = render(React.createElement(Server, {server: { on: true, config }}));
+      const config = {url: 'udp://239.0.0.1:1234', port: 4567};
+      const {lastFrame} = render(React.createElement(Server, {server: {on: true, config}}));
       const rendered = stripAnsi(lastFrame());
-      const msg = `Server status: listening on 4567
-HLS: http://localhost:4567/hls.html?s=udp://239.0.0.1:1234
-`;
-      expect(rendered).toEqual(msg);
+      const msg = `Server status: listening on 4567`;
+      expect(rendered.trim()).toEqual(msg.trim());
     });
   });
 

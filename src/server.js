@@ -8,9 +8,14 @@ const o = require('./output');
 const { setupRoutes } = require('./routes');
 const { DEFAULT_POLLING_TIME } = require('./config');
 const { serverStatus } = require('./server_status');
+const { getProgram} = require('./programs');
+const version= require('./version').version;
+const { addProgram, clearPrograms } = require('./programs');
 
 let app;
 let server;
+
+axios.defaults.headers['X_VMR_CLIENT_VERSION'] = version;
 
 module.exports.run = (
   config,
@@ -30,6 +35,10 @@ module.exports.run = (
   }
 };
 
+const notifyDeliveryOfTsFile = (path, programId) => {
+  o.message( `Delivering TS File: ${path + ( programId ? ('/' + programId ) : '' ) }`);
+};
+
 const startServer = (module.exports.startServer = config => {
   if (!app) {
     if (server) {
@@ -47,15 +56,29 @@ const startServer = (module.exports.startServer = config => {
       })
     );
 
+    app.get('/pid/:pid/index.m3u8', (req,res) => {
+      const { pid } = req.params;
+      res.redirect(`/${pid}/index.m3u8`);
+    });
+
+    app.get('/pid/:pid/hls.html', (req,res) => {
+      const { pid } = req.params;
+      const program = getProgram(pid);
+      // Get program redirect to the HLS.html?s=URL
+      res.redirect(`/hls.html?s=${program.url}`);
+    });
+
     app.get('/:path/:tsFile', function(req, res) {
       const path = req.params.tsFile;
       res.sendFile(path, { root: config.fixedDirectory });
+      notifyDeliveryOfTsFile(path, programId);
     });
 
     app.get('/:path/:programId/:tsFile', function(req, res) {
       const path = req.params.tsFile;
       const programId = req.params.programId;
       res.sendFile(path, { root: path.join(config.fixedDirectory, programId) });
+      notifyDeliveryOfTsFile(path, programId);
     });
 
     if (config.credentials) {
@@ -80,27 +103,21 @@ const notifyListenError = () => {
 };
 
 const processResponse = (module.exports.processReponse = response => {
-  let { isOn = false, redirect = false, url, port, flags, credentials, programId, mcastUrl, startDateTime, endDateTime, pollInterval } = {};
+  let { on = false, port, credentials, programs, pollInterval, redirect } = {};
   if (typeof response.data === 'object') {
-    if (response.data.on) {
-      isOn = true;
-      redirect = 'redirect' === response.data.type;
-      url = response.data.url;
-      source = response.data.source;
+    if (response.data) {
       port = response.data.port;
-      flags = response.data.flags;
       credentials = response.data.credentials;
-      programId = response.data.programId;
-      mcastUrl = response.data.mcastUrl;
-      startDateTime = response.data.startDateTime;
-      endDateTime = response.data.endDateTime;
+      programs = response.data.programs;
       pollInterval = response.data.pollInterval;
+      on = response.data.on;
+      redirect = response.data.type === 'redirect';
     }
   } else if (0 === response.data.indexOf('on')) {
-    isOn = true;
+    on = true;
   }
 
-  return { isOn, redirect, url, port, flags, credentials,  programId, mcastUrl, startDateTime, endDateTime, pollInterval  };
+  return { on, port, credentials, programs, pollInterval, redirect  };
 });
 
 const stopServer = (module.exports.stopServer = (config) => {
@@ -148,8 +165,8 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
         if (dynamic) {
           o.poll( { response: dynamic });
           o.message('Poll server request successful');
-          isOn = dynamic.isOn;
-          if (isOn) {
+          on = dynamic.on;
+          if (on) {
             o.poll({on: true});
             const carefullyMerged = { ...config };
             Object.keys(dynamic).forEach(k => {
@@ -160,6 +177,12 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
             _startServer(carefullyMerged);
 
             if (hasProgram(carefullyMerged)) {
+              // Add the programs to our list.
+              // clearPrograms();
+              carefullyMerged.programs.forEach( p => {
+                addProgram(p.programId, p);
+              });
+
               const dynamic = convertCarefullyMergedToDynamic(carefullyMerged);
               config.segmenter.launchIfNecessary(config, dynamic);
             }
@@ -189,11 +212,11 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
 
 const convertCarefullyMergedToDynamic = (merged) => {
   const dynamic = {};
-  dynamic.address = merged.mcastUrl;
-  dynamic.programId = merged.programId;
+  dynamic.programs = merged.programs;
+  dynamic.on = merged.on;
   return dynamic;
 }
 
 const hasProgram = module.exports.hasProgram = config => {
-  return (config.mcastUrl && config.programId);
+  return (config.programs && config.programs.length > 0);
 }

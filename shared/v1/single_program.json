@@ -1,0 +1,11 @@
+{
+  "programs": [
+    {
+      "url": "http://mediaserver.vivoh.com/live/stream.m3u8",
+      "type": "redirect",
+      "on": true,
+      "programId": 1569763872572
+    }
+  ],
+  "on": true
+}

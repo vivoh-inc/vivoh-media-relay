@@ -8,10 +8,11 @@
       "type": "node",
       "request": "launch",
       "name": "Simple",
-      "program": "${workspaceFolder}/src/index.js"
+      "program": "${workspaceFolder}/src/index.js",
       // "args" : [
       //     "-p", "6060"
       // ]
+      "internalConsoleOptions": "openOnSessionStart"
     },
     {
       "type": "node",
@@ -54,7 +55,36 @@
       ],
       "internalConsoleOptions": "openOnSessionStart"
     },
-
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha Tests (ffmpeg)",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "args": [
+        "--timeout",
+        "999999",
+        "--colors",
+        "${workspaceFolder}/test",
+        "-g",
+        "#ffmpeg"
+      ],
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha Tests (checkPollServer)",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "args": [
+        "--timeout",
+        "999999",
+        "--colors",
+        "${workspaceFolder}/test",
+        "-g",
+        "#checkPollServer"
+      ],
+      "internalConsoleOptions": "openOnSessionStart"
+    },
     {
       "type": "node",
       "request": "launch",
@@ -134,9 +164,9 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Poll Mode with Ffmpeg Start and System Information",
+      "name": "Poll Mode (All) and System Information",
       "program": "${workspaceFolder}/src/index.js",
-      "args": ["-t", "5", "-u", "http://localhost:9090/ffmpeg", "-s"]
+      "args": ["-t", "5", "-u", "http://localhost:8080/all.json", "--systemInformation"]
     },
     {
       "type": "node",
