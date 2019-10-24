@@ -64,8 +64,13 @@ const startServer = (module.exports.startServer = config => {
     app.get('/pid/:pid/hls.html', (req,res) => {
       const { pid } = req.params;
       const program = getProgram(pid);
-      // Get program redirect to the HLS.html?s=URL
-      res.redirect(`/hls.html?s=${program.url}`);
+      if (program.type === 'redirect') {
+        res.redirect(program.url);
+      }
+      else {
+        // Get program redirect to the HLS.html?s=URL
+        res.redirect(`/hls.html?s=${program.url}`);
+      }
     });
 
     app.get('/:path/:tsFile', function(req, res) {

@@ -69,12 +69,16 @@ module.exports.launchIfNecessary = function(config, dynamic,
     const promises = [];
 
     if (!programs || programs.length <= 0) {
-      promises.push(getFfmpegPromise( { url: dynamic.url, fixedDirectory, extras, _launchFfmpeg, _isFfmpegRunning }));
+      if (dynamic.type !== 'redirect') {
+        promises.push(getFfmpegPromise( { url: dynamic.url, fixedDirectory, extras, _launchFfmpeg, _isFfmpegRunning }));
+      }
     }
     else {
       programs.forEach(p => {
-        const promise = getFfmpegPromise({...p, extras, fixedDirectory, _isFfmpegRunning, _launchFfmpeg});
-        promises.push(promise);
+        if (p.type !== 'redirect') {
+          const promise = getFfmpegPromise({...p, extras, fixedDirectory, _isFfmpegRunning, _launchFfmpeg});
+          promises.push(promise);
+        }
       });
     }
 

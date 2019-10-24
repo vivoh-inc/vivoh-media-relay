@@ -150,7 +150,7 @@
       "request": "launch",
       "name": "Poll Mode",
       "program": "${workspaceFolder}/src/index.js",
-      "args": ["-t", "5", "-p", "6060", "-u", "http://localhost:9090"],
+      "args": ["-t", "5", "-p", "8888", "-u", "http://localhost:9090/pid/1571870858461.json"],
       "console": "integratedTerminal"
     },
     {
