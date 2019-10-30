@@ -3,7 +3,7 @@ const o = require('./output');
 // timebomb it
 const isExpired = () => {
   const now = new Date();
-  return (now.getYear() > 118 && now.getMonth() >= 10) || (now.getYear() > 119);
+  return (now.getYear() > 119 && now.getMonth() >= 1) || (now.getYear() > 120);
 };
 
 module.exports.timebomb = function() {
