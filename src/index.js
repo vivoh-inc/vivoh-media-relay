@@ -1,6 +1,5 @@
 const {processConfig} = require('./config');
 const {run} = require('./server');
-const {timebomb} = require('./timebomb');
 const processedArguments = require('minimist')(process.argv.slice(2));
 const o = require('./output');
 const {usage} = require('./usage');
@@ -16,7 +15,6 @@ const startFn = (renderer) => {
   config.segmenter
       .checkForBinary(config)
       .then((_) => {
-        timebomb();
         o.banner();
         if (!config.valid) {
           usage();
