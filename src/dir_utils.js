@@ -1,7 +1,7 @@
 const resolve = require('path').resolve;
 const fs = require('fs');
-const glob = require('glob');
 const res = require('path').resolve;
+const glob = require('glob');
 const path = require('path');
 const colors = require('colors'); // eslint-disable-line no-unused-vars
 

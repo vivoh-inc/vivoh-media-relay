@@ -1,8 +1,8 @@
 const React = require('react');
 const PropTypes = require('prop-types');
-const { Text, Color } = require('ink');
+const {Text, Color} = require('ink');
 
-const Programs = ({ programs }) => {
+const Programs = ({programs}) => {
   if (!programs || !programs.length) {
     return null;
   } else {

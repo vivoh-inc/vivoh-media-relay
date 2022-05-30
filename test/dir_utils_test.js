@@ -1,7 +1,6 @@
 // const assert = require('assert');
 const tmp = require('tmp');
 const path = require('path');
-const glob = require('glob');
 const fs = require('fs');
 const dirUtils = require( '../src/dir_utils');
 const expect = require('expect');

@@ -1,4 +1,4 @@
-const { spawn } = require('child_process');
+const {spawn} = require('child_process');
 const psList = require('ps-list');
 const tasklist = require('tasklist');
 const ps = require('ps-node');
@@ -14,9 +14,9 @@ const isWindows = process.platform === 'win32';
 const listProcesses = isWindows ? tasklist : psList;
 
 let logFile = undefined;
-const writeLog = m => {
+const writeLog = (m) => {
   if (logFile) {
-    fs.appendFile(logFile, m, err => {
+    fs.appendFile(logFile, m, (err) => {
       // console.error( "Unable to write to: ", logFile );
     });
   }
@@ -24,94 +24,92 @@ const writeLog = m => {
 
 module.exports.name = 'ffmpeg';
 
-module.exports.killProcesses = _ => {
+module.exports.killProcesses = (_) => {
   const _urls = Object.keys(pids);
 
   const killed = [];
-  _urls.forEach(url => {
+  _urls.forEach((url) => {
     const pid = pids[url];
     if (pid) {
       console.log('Killing ffmpeg pid: ', pid);
-      ps.kill(pid, err => {
+      ps.kill(pid, (err) => {
         if (err) {
           o.errors('Error killing ffmpeg process');
         } else {
           killed.push(pid);
-          o.updateSegmenter(url, { status: 'off'});
+          o.updateSegmenter(url, {status: 'off'});
         }
       });
     }
   });
 
-  killed.forEach(k => {
+  killed.forEach((k) => {
     delete pids[k];
   });
-
 };
 
 module.exports.launchIfNecessary = function(config, dynamic,
-    { _launchFfmpeg, _isFfmpegRunning } = { _launchFfmpeg: launchFfmpeg, _isFfmpegRunning: isFfmpegRunning }) {
-    const { fixedDirectory, extras } = config;
-    const { programs } = dynamic;
+    {_launchFfmpeg, _isFfmpegRunning} = {_launchFfmpeg: launchFfmpeg, _isFfmpegRunning: isFfmpegRunning}) {
+  const {fixedDirectory, extras} = config;
+  const {programs} = dynamic;
 
-    const emptyPromise = new Promise( (resolve) => resolve());
+  const emptyPromise = new Promise( (resolve) => resolve());
 
-    if (!(config && Object.keys(config).length != 0 && config.ipAddress)) {
-      // throw new Error('Invalid arguments provided, internal error.');
-      return emptyPromise;
+  if (!(config && Object.keys(config).length != 0 && config.ipAddress)) {
+    // throw new Error('Invalid arguments provided, internal error.');
+    return emptyPromise;
+  }
+
+  if (!fixedDirectory) {
+    return emptyPromise;
+    // throw new Error('Invalid directory, internal error: ' + fixedDirectory);
+  }
+
+  const promises = [];
+
+  if (!programs || programs.length <= 0) {
+    if (dynamic.type !== 'redirect') {
+      promises.push(getFfmpegPromise( {url: dynamic.url, fixedDirectory, extras, _launchFfmpeg, _isFfmpegRunning}));
     }
-
-    if (!fixedDirectory) {
-      return emptyPromise;
-      // throw new Error('Invalid directory, internal error: ' + fixedDirectory);
-    }
-
-    const promises = [];
-
-    if (!programs || programs.length <= 0) {
-      if (dynamic.type !== 'redirect') {
-        promises.push(getFfmpegPromise( { url: dynamic.url, fixedDirectory, extras, _launchFfmpeg, _isFfmpegRunning }));
-      }
-    }
-    else {
-      programs.forEach(p => {
-        if (p.type !== 'redirect') {
-          const promise = getFfmpegPromise({...p, extras, fixedDirectory, _isFfmpegRunning, _launchFfmpeg});
-          promises.push(promise);
-        }
-      });
-    }
-
-    return Promise.all(promises);
-  };
-
-  const getFfmpegPromise = ( { url, extras, programId, fixedDirectory, _isFfmpegRunning, _launchFfmpeg }) => {
-    return _isFfmpegRunning(url).then(running => {
-      if (running) {
-        o.updateSegmenter( url, { status: 'on'});
-      } else {
-        o.updateSegmenter( url, {status: 'starting'});
-        if (!_launchFfmpeg({ extras, url,
-            fixedDirectory, programId})
-        ) {
-          o.updateSegmenter( url, { status: 'failed'});
-        }
+  } else {
+    programs.forEach((p) => {
+      if (p.type !== 'redirect') {
+        const promise = getFfmpegPromise({...p, extras, fixedDirectory, _isFfmpegRunning, _launchFfmpeg});
+        promises.push(promise);
       }
     });
   }
 
-const isFfmpegRunning = (module.exports.isRunning = url => {
+  return Promise.all(promises);
+};
+
+const getFfmpegPromise = ( {url, extras, programId, fixedDirectory, _isFfmpegRunning, _launchFfmpeg}) => {
+  return _isFfmpegRunning(url).then((running) => {
+    if (running) {
+      o.updateSegmenter( url, {status: 'on'});
+    } else {
+      o.updateSegmenter( url, {status: 'starting'});
+      if (!_launchFfmpeg({extras, url,
+        fixedDirectory, programId})
+      ) {
+        o.updateSegmenter( url, {status: 'failed'});
+      }
+    }
+  });
+};
+
+const isFfmpegRunning = (module.exports.isRunning = (url) => {
   return new Promise((resolve, reject) => {
     const pid = pids[url];
     listProcesses()
-      .then(processes => {
-        resolve(processFilter.pidIsRunning(processes, pid));
-      })
-      .catch(err => {
-        e.errors('We got an error with ffmpeg');
-        o.errors('We got an error with ffmpeg');
-        reject(err);
-      });
+        .then((processes) => {
+          resolve(processFilter.pidIsRunning(processes, pid));
+        })
+        .catch((err) => {
+          e.errors('We got an error with ffmpeg');
+          o.errors('We got an error with ffmpeg');
+          reject(err);
+        });
   });
 });
 
@@ -157,14 +155,14 @@ const getArgumentsForFfmpeg = (module.exports.getArgumentsForFfmpeg = ({
   }
   fullPath.push('redirect.m3u8');
   args.push(path.join(...fullPath));
-  return { args, exe };
+  return {args, exe};
 });
 
 const connectedStreams = {};
 
 const launchFfmpeg = (module.exports.launchFfmpeg = (ffmpegConfig) => {
-  const { args, exe } = getArgumentsForFfmpeg(ffmpegConfig);
-  const { url } = ffmpegConfig;
+  const {args, exe} = getArgumentsForFfmpeg(ffmpegConfig);
+  const {url} = ffmpegConfig;
 
   if (!(exe && args)) {
     o.errors('Invalid arguments');
@@ -174,39 +172,39 @@ const launchFfmpeg = (module.exports.launchFfmpeg = (ffmpegConfig) => {
 
     writeLog(fullCommand);
     const ffmpeg = spawn(exe, args);
-    ffmpeg.on('error', e => {
+    ffmpeg.on('error', (e) => {
       writeLog(e);
     });
-    ffmpeg.stdout.on('data', _ => {
+    ffmpeg.stdout.on('data', (_) => {
       // if (!connectedStreams[address]) {
       //   connectedStreams[address] = true;
       // }
       // console.log(`FFMPEG： ${data}`);
     });
-    ffmpeg.stderr.on('data', data => {
+    ffmpeg.stderr.on('data', (data) => {
       writeLog(data);
     });
-    ffmpeg.on('close', code => {
+    ffmpeg.on('close', (code) => {
       writeLog(`FFMPEG close: ${code}`);
       connectedStreams[url] = false;
     });
 
     o.message('Connected to multicast stream: ' + url);
     pids[url] = ffmpeg.pid;
-    o.updateSegmenter(url, { status: 'starting' });
+    o.updateSegmenter(url, {status: 'starting'});
     return true;
   }
 });
 
-module.exports.checkForBinary = config => {
+module.exports.checkForBinary = (config) => {
   // Test for ffmpeg, use a fake address to get the args correctly.
   return new Promise((resolve, reject) => {
-    const { exe } = getArgumentsForFfmpeg({ ...config, url: 'x.x.x.x' });
+    const {exe} = getArgumentsForFfmpeg({...config, url: 'x.x.x.x'});
     const ffmpeg = spawn(exe);
-    ffmpeg.on('error', _ => {
+    ffmpeg.on('error', (_) => {
       reject(exe);
     });
-    ffmpeg.on('close', _ => {
+    ffmpeg.on('close', (_) => {
       resolve();
     });
   });

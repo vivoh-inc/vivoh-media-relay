@@ -5,12 +5,14 @@ const https = require('https');
 const axios = require('axios');
 const os = require('os');
 const o = require('./output');
-const { setupRoutes } = require('./routes');
-const { DEFAULT_POLLING_TIME } = require('./config');
-const { serverStatus } = require('./server_status');
-const { getProgram} = require('./programs');
+const {setupRoutes} = require('./routes');
+const {DEFAULT_POLLING_TIME} = require('./config');
+const {serverStatus} = require('./server_status');
+const {getProgram} = require('./programs');
 const version= require('./version').version;
-const { addProgram, clearPrograms } = require('./programs');
+const {addProgram,
+  // clearPrograms
+} = require('./programs');
 
 let app;
 let server;
@@ -18,11 +20,11 @@ let server;
 axios.defaults.headers['X_VMR_CLIENT_VERSION'] = version;
 
 module.exports.run = (
-  config,
-  { _checkPollServerForStatus, _startServer } = {
-    _checkPollServerForStatus: checkPollServerForStatus,
-    _startServer: startServer
-  }
+    config,
+    {_checkPollServerForStatus, _startServer} = {
+      _checkPollServerForStatus: checkPollServerForStatus,
+      _startServer: startServer,
+    }
 ) => {
   if (config.poll && config.poll.url) {
     o.poll( config.poll ); // ('POLL'.bold + ' (timeout ' + config.poll.time + ' secs)\n');
@@ -39,7 +41,7 @@ const notifyDeliveryOfTsFile = (path, programId) => {
   o.message( `Delivering TS File: ${path + ( programId ? ('/' + programId ) : '' ) }`);
 };
 
-const startServer = (module.exports.startServer = config => {
+const startServer = (module.exports.startServer = (config) => {
   if (!app) {
     if (server) {
       // o.server({on: false});
@@ -47,27 +49,26 @@ const startServer = (module.exports.startServer = config => {
       server.close();
     }
     app = express();
-    setupRoutes({ app, type: 'hls', config });
+    setupRoutes({app, type: 'hls', config});
     app.use(
-      express.static(config.fixedDirectory, {
-        setHeaders: (res, _, __) => {
-          res.set('Access-Control-Allow-Origin', '*');
-        }
-      })
+        express.static(config.fixedDirectory, {
+          setHeaders: (res, _, __) => {
+            res.set('Access-Control-Allow-Origin', '*');
+          },
+        })
     );
 
-    app.get('/pid/:pid/index.m3u8', (req,res) => {
-      const { pid } = req.params;
+    app.get('/pid/:pid/index.m3u8', (req, res) => {
+      const {pid} = req.params;
       res.redirect(`/${pid}/index.m3u8`);
     });
 
-    app.get('/pid/:pid/hls.html', (req,res) => {
-      const { pid } = req.params;
+    app.get('/pid/:pid/hls.html', (req, res) => {
+      const {pid} = req.params;
       const program = getProgram(pid);
       if (program.type === 'redirect') {
         res.redirect(program.url);
-      }
-      else {
+      } else {
         // Get program redirect to the HLS.html?s=URL
         res.redirect(`/hls.html?s=${program.url}`);
       }
@@ -75,30 +76,30 @@ const startServer = (module.exports.startServer = config => {
 
     app.get('/:path/:tsFile', function(req, res) {
       const path = req.params.tsFile;
-      res.sendFile(path, { root: config.fixedDirectory });
+      res.sendFile(path, {root: config.fixedDirectory});
       notifyDeliveryOfTsFile(path, programId);
     });
 
     app.get('/:path/:programId/:tsFile', function(req, res) {
       const path = req.params.tsFile;
       const programId = req.params.programId;
-      res.sendFile(path, { root: path.join(config.fixedDirectory, programId) });
+      res.sendFile(path, {root: path.join(config.fixedDirectory, programId)});
       notifyDeliveryOfTsFile(path, programId);
     });
 
     if (config.credentials) {
       server = https
-        .createServer(config.credentials, app)
-        .listen(config.port, config.ipAddress, () => o.server( { on: true, config } ))
-        .on('error', notifyListenError);
+          .createServer(config.credentials, app)
+          .listen(config.port, config.ipAddress, () => o.server( {on: true, config} ))
+          .on('error', notifyListenError);
     } else {
       server = http
-        .createServer(app)
-        .listen(config.port, config.ipAddress, () => o.server( { on: true, config } ) )
-        .on('error', notifyListenError);
+          .createServer(app)
+          .listen(config.port, config.ipAddress, () => o.server( {on: true, config} ) )
+          .on('error', notifyListenError);
     }
 
-    o.server( { on: true, config });
+    o.server( {on: true, config});
     serverStatus.on = true;
   }
 });
@@ -107,8 +108,8 @@ const notifyListenError = () => {
   o.errors('An error occurred, is the server already running?');
 };
 
-const processResponse = (module.exports.processReponse = response => {
-  let { on = false, port, credentials, programs, pollInterval, redirect } = {};
+const processResponse = (module.exports.processReponse = (response) => {
+  let {on = false, port, credentials, programs, pollInterval, redirect} = {};
   if (typeof response.data === 'object') {
     if (response.data) {
       port = response.data.port;
@@ -122,7 +123,7 @@ const processResponse = (module.exports.processReponse = response => {
     on = true;
   }
 
-  return { on, port, credentials, programs, pollInterval, redirect  };
+  return {on, port, credentials, programs, pollInterval, redirect};
 });
 
 const stopServer = (module.exports.stopServer = (config) => {
@@ -130,26 +131,25 @@ const stopServer = (module.exports.stopServer = (config) => {
     server.close();
     app = undefined;
     server = undefined;
-    o.server({on:false});
+    o.server({on: false});
     config.segmenter.killProcesses();
   }
   serverStatus.on = false;
 });
 
 const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
-  config,
-  // These lines are only overriden inside tests
-  { _axios, _setTimeout, _processResponse, _startServer, _stopServer, _loop, _si } = {
-    _axios: axios,
-    _si: si,
-    _setTimeout: setTimeout,
-    _processResponse: processResponse,
-    _startServer: startServer,
-    _stopServer: stopServer,
-    _loop: true,
-  }
+    config,
+    // These lines are only overriden inside tests
+    {_axios, _setTimeout, _processResponse, _startServer, _stopServer, _loop, _si} = {
+      _axios: axios,
+      _si: si,
+      _setTimeout: setTimeout,
+      _processResponse: processResponse,
+      _startServer: startServer,
+      _stopServer: stopServer,
+      _loop: true,
+    }
 ) => {
-
   const hostname = process.env.VMR_HOSTNAME || os.hostname();
   const requestObj = ( config.poll.systemInformation ?
       Promise.all( [
@@ -158,58 +158,64 @@ const checkPollServerForStatus = (module.exports.checkPollServerForStatus = (
         _si.currentLoad(),
         _si.services('ffmpeg'),
         _si.networkInterfaces(),
-        _si.networkStats(), ] )
-      .then( ([ cpu, mem, load, ffmpeg, interfaces, network ]) =>
-        _axios.post(config.poll.url, { systemInformation: { hostname, cpu, mem, load, ffmpeg, interfaces, network } } ) ) :
+        _si.networkStats()] )
+          .then( ([cpu, mem, load, ffmpeg, interfaces, network]) =>
+            _axios.post(config.poll.url, {systemInformation: {hostname,
+              cpu,
+              mem,
+              load,
+              ffmpeg,
+              interfaces,
+              network}} ) ) :
       _axios.get(config.poll.url) );
 
   const promise = requestObj
-    .then(response => {
-      if (response.data) {
-        const dynamic = _processResponse(response);
-        if (dynamic) {
-          o.poll( { response: dynamic });
-          o.message('Poll server request successful');
-          on = dynamic.on;
-          if (on) {
-            o.poll({on: true});
-            const carefullyMerged = { ...config };
-            Object.keys(dynamic).forEach(k => {
-              if (dynamic[k]) {
-                carefullyMerged[k] = dynamic[k];
-              }
-            });
-            _startServer(carefullyMerged);
+      .then((response) => {
+        if (response.data) {
+          const dynamic = _processResponse(response);
+          if (dynamic) {
+            o.poll( {response: dynamic});
+            o.message('Poll server request successful');
+            on = dynamic.on;
+            if (on) {
+              o.poll({on: true});
+              const carefullyMerged = {...config};
+              Object.keys(dynamic).forEach((k) => {
+                if (dynamic[k]) {
+                  carefullyMerged[k] = dynamic[k];
+                }
+              });
+              _startServer(carefullyMerged);
 
-            if (hasProgram(carefullyMerged)) {
+              if (hasProgram(carefullyMerged)) {
               // Add the programs to our list.
               // clearPrograms();
-              carefullyMerged.programs.forEach( p => {
-                addProgram(p.programId, p);
-              });
+                carefullyMerged.programs.forEach( (p) => {
+                  addProgram(p.programId, p);
+                });
 
-              const dynamic = convertCarefullyMergedToDynamic(carefullyMerged);
-              config.segmenter.launchIfNecessary(config, dynamic);
+                const dynamic = convertCarefullyMergedToDynamic(carefullyMerged);
+                config.segmenter.launchIfNecessary(config, dynamic);
+              }
+            } else {
+              o.poll({on: false});
+              config.segmenter.killProcesses();
+              _stopServer(config);
             }
           } else {
-            o.poll({on: false});
-            config.segmenter.killProcesses();
             _stopServer(config);
+            config.segmenter.killFfmpegProcesses();
           }
-        } else {
-          _stopServer(config);
-          config.segmenter.killFfmpegProcesses();
         }
-      }
-    })
-    .catch(error => {
-      o.poll({error});
-      _stopServer(config);
-    });
+      })
+      .catch((error) => {
+        o.poll({error});
+        _stopServer(config);
+      });
 
   if (_loop) {
     _setTimeout(() => checkPollServerForStatus(config),
-      (config.poll.time || DEFAULT_POLLING_TIME) * 1000);
+        (config.poll.time || DEFAULT_POLLING_TIME) * 1000);
   } else {
     return promise;
   }
@@ -220,8 +226,8 @@ const convertCarefullyMergedToDynamic = (merged) => {
   dynamic.programs = merged.programs;
   dynamic.on = merged.on;
   return dynamic;
-}
+};
 
-const hasProgram = module.exports.hasProgram = config => {
+const hasProgram = module.exports.hasProgram = (config) => {
   return (config.programs && config.programs.length > 0);
-}
+};

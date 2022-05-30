@@ -94,7 +94,6 @@ describe('#server', () => {
       });
     });
 
-
     it('should check the poll server and start ffmpeg if configured as such', (done) => {
       const response = {data: 'on'};
       const _axios = {get: sinon.stub().resolves(response)};
