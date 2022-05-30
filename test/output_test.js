@@ -34,7 +34,7 @@ describe('#ui', () => {
       ];
       const {lastFrame} = render(React.createElement(Programs, {programs}));
       const rendered = stripAnsi(lastFrame());
-      expect(rendered).toEqual('XYZ [12314123] \nABC [123123213] ');
+      expect(rendered).toEqual('XYZ [12314123] \nABC [123123213]');
     });
   });
 });
