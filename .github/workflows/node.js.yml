@@ -31,4 +31,9 @@ jobs:
     - run: npm run test
     - run: npm run coverage
     - run: npm run build-all --if-present
+    - name: artifacts
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        path: build
+
     
