@@ -44,7 +44,7 @@
 		"react-dom": "^16.10.2",
 		"systeminformation": "^4.14.8",
 		"tasklist": "^4.0.0",
-		"vivoh-media-players": "git+https://oauth:G3rh6rTarC9aySqXs-gS@source.vivoh.com/vivoh/vivoh-media-players.git"
+		"vivoh-media-players": "git+https://github.com/vivoh-inc/vivoh-media-players.git"
 	},
 	"devDependencies": {
 		"eslint": "^5.15.3",
