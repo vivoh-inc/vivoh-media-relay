@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 'use strict';
 const React = require('react');
-const PropTypes = require('prop-types');
+// const PropTypes = require('prop-types');
 const {Text, Box} = require('ink');
 const {useState, useEffect} = require('react');
 const useInterval = require('./UseInterval');

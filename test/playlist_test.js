@@ -1,5 +1,4 @@
 const expect = require('expect');
-const sinon = require('sinon');
 const fs = require('fs');
 const {rewriteM3u8File} = require('../src/playlist');
 

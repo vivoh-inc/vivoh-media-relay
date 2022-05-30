@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const config = {};
 const ffmpegSegmenter = require('./ffmpeg');
-const tsduckSegmenter = require('./tsduck');
 const o = require('./output');
 
 module.exports.DEFAULT_FIXED_DIRECTORY = './vivoh_media_relay';
@@ -105,7 +104,7 @@ module.exports.processConfig = (processedArguments) => {
     ? getCredentials(processedArguments.e)
     : undefined;
 
-  
+
   // config.segmenterName = processedArguments.s !== 'tsduck' ? 'ffmpeg' : 'tsduck';
   // config.segmenter = config.segmenterName === 'ffmpeg' ? ffmpegSegmenter : tsduckSegmenter;
 
