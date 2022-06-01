@@ -1,0 +1,17 @@
+{
+  "on": true,
+  "programs": [
+    {
+      "url": "http://mediaserver.vivoh.com/live/stream.m3u8",
+      "type": "redirect",
+      "on": true,
+      "programId": 1569763872572
+    },
+    {
+      "url": "rtp://239.0.0.2:1234",
+      "type": "redirect",
+      "on": false,
+      "programId": 1569763872573
+    }
+  ]
+}

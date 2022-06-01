@@ -1,0 +1,64 @@
+{
+    "name": "vivoh-media-relay",
+    "version": "1.3.7",
+    "description": "## Usage",
+    "bin": "src/index.js",
+    "main": "src/index.js",
+    "private": true,
+    "pkg": {
+        "assets": [
+            "assets",
+            "node_modules/vivoh-media-players/assets",
+            "certs"
+        ]
+    },
+    "scripts": {
+        "test": "mocha test",
+        "coverage": "nyc --reporter=text mocha test",
+        "lint": "eslint src test",
+        "build-all": "pkg -d package.json -t node12-linux,node12-macos,node12-win -o build/vivoh-media-relay",
+        "start-poll-server": "node dev/server.js",
+        "start-h264-multicast": "ffmpeg -re -i video/test.mp4 -c:a aac -ar 48000 -b:a 128k -c:v h264 -profile:v main -crf 20 -g 48 -keyint_min 48 -sc_threshold 0 -b:v 2500k -maxrate 2675k -bufsize 3750k -f mpegts udp://239.0.0.1:1234",
+        "start-h264-rtmp": "ffmpeg -re -i video/test.mp4 -c:a aac -ar 48000 -b:a 128k -c:v h264 -profile:v main -crf 20 -g 48 -keyint_min 48 -sc_threshold 0 -b:v 2500k -maxrate 2675k -bufsize 3750k -f flv rtmp://localhost/live/stream",
+        "start-h264-multicast-rtp": "ffmpeg -re -i video/test.mp4 -c:a aac -ar 48000 -b:a 128k -c:v h264 -profile:v main -crf 20 -g 48 -keyint_min 48 -sc_threshold 0 -b:v 2500k -maxrate 2675k -bufsize 3750k -f rtp_mpegts rtp://239.0.0.1:1234"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "axios": "^0.18.0",
+        "blessed": "^0.1.81",
+        "body-parser": "^1.19.0",
+        "colors": "^1.3.3",
+        "express": "^4.16.4",
+        "glob": "^7.1.3",
+        "ip": "^1.1.5",
+        "js-yaml": "^3.12.2",
+        "lodash": "^4.17.15",
+        "meow": "^5.0.0",
+        "minimist": "1.2.0",
+        "pkg": "^4.3.7",
+        "prop-types": "^15.7.2",
+        "ps-list": "^6.2.0",
+        "ps-node": "^0.1.6",
+        "react": "^16.10.2",
+        "react-dom": "^16.10.2",
+        "systeminformation": "^4.14.8",
+        "tasklist": "^4.0.0",
+        "vivoh-media-players": "git+https://github.com/vivoh-inc/vivoh-media-players.git"
+    },
+    "devDependencies": {
+        "eslint": "^5.15.3",
+        "eslint-config-google": "^0.12.0",
+        "eslint-plugin-react": "^7.16.0",
+        "eslint-plugin-react-hooks": "^2.1.2",
+        "expect": "^23.6.0",
+        "mkdirp": "^0.5.1",
+        "mocha": "^6.1.4",
+        "npm": "^6.9.0",
+        "nyc": "^14.1.0",
+        "sinon": "^7.3.2",
+        "strip-ansi": "^5.2.0",
+        "supertest": "^4.0.2",
+        "tmp": "0.0.33"
+    }
+}

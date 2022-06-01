@@ -1,0 +1,14 @@
+video/*
+*~
+node_modules
+tmp/
+build/
+chunks
+.\#*
+\#*\#
+#.vscode
+*.log
+*.m3u8
+*.ts
+.nyc_output
+build*

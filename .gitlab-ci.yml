@@ -1,0 +1,83 @@
+# This file is a template, and might need editing before it works on your project.
+# Official framework image. Look for the different tagged releases at:
+# https://hub.docker.com/r/library/node/tags/
+image: node:16
+
+# This folder is cached between builds
+# http://docs.gitlab.com/ce/ci/yaml/README.html#cache
+# cache:
+#   paths:
+#     - node_modules/
+
+variables:
+  VMR_VERSION: 1.5.2
+  VIVOH_APP: vmr
+  DIRECTORY: uploads
+
+stages:
+  - build
+  - installer
+  - upload
+#   - verify
+
+# test:
+#   stage: build
+#   tags:
+#     - linux
+#   script:
+#     - cd app
+#     - yarn install
+#     - yarn test
+exe:
+  stage: build
+  tags:
+    - linux
+  script:
+    - yarn
+    # - yarn test || true
+    - yarn build-all
+  artifacts:
+    paths:
+      - build
+    expire_in: 1 week
+
+windows-installer:
+  stage: installer
+  retry: 2
+  tags:
+    - windows-installer
+  dependencies:
+    - exe
+  script:
+    - cd installer
+    - cmd.exe /C "dir"
+    - echo $env:CI_COMMIT_SHORT_SHA
+    - cmd.exe /C  "echo "$env:CI_COMMIT_SHORT_SHA
+    - cmd.exe /C  "runner.bat installer.bat installer.bat.log "$env:CI_COMMIT_SHORT_SHA
+  artifacts:
+    paths:
+      - installer
+      # - VMR_installer.bat.log
+    expire_in: 1 week
+
+upload:
+  stage: upload
+  retry: 2
+  tags:
+    - linux
+  dependencies:
+    - windows-installer
+    - exe
+  script:
+    - apt update
+    - apt install -y curl jq zip
+    - mkdir -p uploads
+    - cp build/* uploads/.
+    - cp installer/vivoh-media-relay*.exe uploads/
+    - |
+      export DESTINATION=$([ "$CI_COMMIT_REF_PROTECTED" = true ] && echo "binaries" || echo "experimental")
+    - 'echo "Destination: "$DESTINATION'
+    - |
+      for x in $(ls ${DIRECTORY}); do  curl --upload-file ${DIRECTORY}/${x} -X PUT $(curl -s -H "VIVOH-SECRET: ${VIVOH_SECRET}" ${ARTIFACTOR_URL}${DESTINATION}'&sha='${CI_COMMIT_SHORT_SHA}'&app='${VIVOH_APP}'&version='${VMR_VERSION}'&filename='${x} | jq -r '.url'); done
+
+

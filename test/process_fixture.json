@@ -1,0 +1,29 @@
+[
+  {
+    "pid": 1,
+    "name": "systemd",
+    "cmd": "/sbin/init splash",
+    "ppid": 0,
+    "uid": 0,
+    "cpu": 0,
+    "memory": 0
+  },
+  {
+    "pid": 32450,
+    "name": "node",
+    "cmd": "node src/index.js -p 8888 -d ./tmp/ -s udp://239.0.0.1:1234",
+    "ppid": 32448,
+    "uid": 1000,
+    "cpu": 14,
+    "memory": 0.1
+  },
+  {
+    "pid": 32456,
+    "name": "curl",
+    "cmd": "curl http://localhost:8888/playlist.m3u8?a=udp://239.0.0.1:1234",
+    "ppid": 26684,
+    "uid": 1000,
+    "cpu": 0,
+    "memory": 0
+  }
+]

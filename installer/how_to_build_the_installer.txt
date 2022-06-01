@@ -1,0 +1,13 @@
+(You must build vivoh-media-relay first, and then copy the .exe file into here)
+
+To Install NSIS (https://nsis.sourceforge.io/Download)
+Documentation for NSIS (https://nsis.sourceforge.io/Docs/)
+
+To update installer, change Install Script.nsi:
+
+  NSIS requires install script and all files to be installed in the same folder.
+  To update file(s) like the license or Vivoh version, update file(s) in the same folder containing the install script.
+  Make sure the names of new file(s) to be installed matches the names of files to be installed in the script (Install Script, line 29 and below)
+  Open NSIS and run updated Install Script.nsi. This will create a new windows installer in the folder containing the install script. This will create a Windows installer that will install all the files, it will automatically be added to the folder containing the new updated script, if it  runs correctly.
+
+

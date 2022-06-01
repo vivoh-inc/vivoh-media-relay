@@ -1,0 +1,1 @@
+ffmpeg.exe -stream_loop -1 -re -i globe.mp4 -c:a aac -ar 48000 -b:a 128k -c:v h264 -profile:v main -crf 20 -g 48 -keyint_min 48 -sc_threshold 0 -b:v 2500k -maxrate 2675k -bufsize 3750k -f rtp_mpegts rtp://239.0.0.1:1234
